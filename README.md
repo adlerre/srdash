@@ -4,3 +4,32 @@ A Java app to consume UDP telemetry data from Codemaster's F1 2018/2019 video ga
 
 Project based on work of [eh7n](https://github.com/eh7n/f1-2018_telemetry).
 
+## Usage
+
+Run on commandline with:
+```shell
+java -jar srdash.jar --help
+```
+
+### Commandline Options
+
+* **--configDir, -cd**<br />
+  
+  Set configuration dir.
+  
+* **-h, --help**<bbr />
+
+  Print help (this message) and exit.
+  
+* **--host**<br />
+
+  Set host listen on
+  
+* **--port, -p**<br />
+  *Default:* `8085`<br />
+  
+  Set port listen on
+  
+* **--telemetryVersion, -tv**<br />
+  
+  Set telemetry version
