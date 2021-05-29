@@ -19,6 +19,7 @@ script:
   - mvn -B clean install
 deploy:
   provider: releases
+  skip_cleanup: true
   api_key: ${GH_TOKEN}
   file: "target/srdash.jar"
   on:
