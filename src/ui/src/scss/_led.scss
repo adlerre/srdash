@@ -1,0 +1,210 @@
+$ledCalcSize: 24px;
+$ledSize: $ledCalcSize !default;
+$ledSizeSmall: 16px !default;
+$ledSizeBig: 32px !default;
+
+$ledColors: (
+    "red":(
+        "on": (
+            "bg": #F00,
+            "colors": ( #441313, #F00 ) 
+        ),
+        "dim": (
+            "bg": #A00,
+            "colors": ( #441313, #F00 ) 
+        )
+    ),
+    "yellow": (
+        "on": (
+            "bg": #FF0,
+            "colors": ( #808002, #FF0 ) 
+        ),
+        "dim": (
+            "bg": #AA0,
+            "colors": ( #808002, #FF0 ) 
+        )
+    ),
+    "green": (
+        "on": (
+            "bg": #ABFF00,
+            "colors": ( #304701, #89FF00 )
+        ),
+        "dim": (
+            "bg": #0BAA00,
+            "colors": ( #304701, #89FF00 )
+        )
+    ),
+    "blue": (
+        "on": (
+            "bg": #24E0FF,
+            "colors": ( #006, #3F8CFF )
+        ),
+        "dim": (
+            "bg": #24E0AA,
+            "colors": ( #006, #3F8CFF )
+        )
+    )
+);
+
+@function ledSizeRatio($size) {
+    @return $ledCalcSize / $size;
+}
+
+@function ledDarkShadow($size) {
+    $ratio: ledSizeRatio($size);
+    @return rgba(0, 0, 0, 0.2) 0 (-1px / $ratio) (7px / $ratio) (1px / $ratio);
+}
+
+@function ledInnerShadow($size, $color) {
+    $ratio: ledSizeRatio($size);
+    @return inset $color 0 (-1px / $ratio) (9px / $ratio);
+}
+
+@function ledGlowShadow($size, $color, $on: false) {
+    $ratio: ledSizeRatio($size);
+    $t: 0;
+    
+    @if $on {
+        $t: $size / 2;
+    }
+    
+    @return $color 0 (2px / $ratio) $t;
+}
+
+@mixin led-color($size, $bgColor, $color1, $color2, $on: false) {
+    background-color: $bgColor;
+    box-shadow: ledDarkShadow($size), ledInnerShadow($size, $color1), ledGlowShadow($size, $color2, $on);
+}
+
+.led {
+    display: inline-block;
+    margin: 0 auto;
+    border-radius: 50%;
+
+    width: $ledSize;
+    height: $ledSize;
+    
+    @include led-color($ledSize, #808080, #404040, #808080);
+    
+    transition: background-color 0.25s, box-shadow 0.25s;
+    
+    &.small {
+        width: $ledSizeSmall;
+        height: $ledSizeSmall;
+    
+        @include led-color($ledSizeSmall, #808080, #404040, #808080);
+    }
+    
+    &.big {
+        width: $ledSizeBig;
+        height: $ledSizeBig;
+    
+        @include led-color($ledSizeBig, #808080, #404040, #808080);
+    }
+   
+    @each $name, $status in $ledColors {
+        @keyframes blink-#{$name} {
+            $onOpt: map-get($status, "on");
+            $onBg: map-get($onOpt, "bg");
+            $onColors: map-get($onOpt, "colors");
+            $onCol1: nth($onColors, 1);
+            $onCol2: nth($onColors, 2);
+                
+            from { 
+                @include led-color($ledSize, $onBg, $onCol1, $onCol2, true);
+            }
+            50% { 
+                @include led-color($ledSize, #808080, #404040, #808080); 
+            }
+            to {
+                @include led-color($ledSize, $onBg, $onCol1, $onCol2, true);
+            }
+        }
+        
+        @keyframes blink-#{$name}-small {
+            $onOpt: map-get($status, "on");
+            $onBg: map-get($onOpt, "bg");
+            $onColors: map-get($onOpt, "colors");
+            $onCol1: nth($onColors, 1);
+            $onCol2: nth($onColors, 2);
+                
+            from { 
+                @include led-color($ledSizeSmall, $onBg, $onCol1, $onCol2, true);
+            }
+            50% { 
+                @include led-color($ledSizeSmall, #808080, #404040, #808080); 
+            }
+            to {
+                @include led-color($ledSizeSmall, $onBg, $onCol1, $onCol2, true);
+            }
+        }
+        
+        @keyframes blink-#{$name}-big {
+            $onOpt: map-get($status, "on");
+            $onBg: map-get($onOpt, "bg");
+            $onColors: map-get($onOpt, "colors");
+            $onCol1: nth($onColors, 1);
+            $onCol2: nth($onColors, 2);
+                
+            from { 
+                @include led-color($ledSizeBig, $onBg, $onCol1, $onCol2, true);
+            }
+            50% { 
+                @include led-color($ledSizeBig, #808080, #404040, #808080); 
+            }
+            to {
+                @include led-color($ledSizeBig, $onBg, $onCol1, $onCol2, true);
+            }
+        }
+            
+        &.#{$name} {
+            &.dim {
+                $options: map-get($status, "dim");
+                $bg: map-get($options, "bg");
+                $colors: map-get($options, "colors");
+                $col1: nth($colors, 1);
+                $col2: nth($colors, 2);
+    
+                @include led-color($ledSize, $bg, $col1, $col2); 
+                
+                &.small {
+                    @include led-color($ledSizeSmall, $bg, $col1, $col2);
+                }
+                
+                &.big {
+                    @include led-color($ledSizeBig, $bg, $col1, $col2);
+                }
+            }
+            
+            &.on {
+                $options: map-get($status, "on");
+                $bg: map-get($options, "bg");
+                $colors: map-get($options, "colors");
+                $col1: nth($colors, 1);
+                $col2: nth($colors, 2);
+                
+                @include led-color($ledSize, $bg, $col1, $col2, true);
+                
+                &.small {
+                    @include led-color($ledSizeSmall, $bg, $col1, $col2, true);
+                }
+                
+                 &.big {
+                    @include led-color($ledSizeBig, $bg, $col1, $col2, true);
+                }
+            }
+            
+            &.blink {
+                animation: blink-#{$name} 0.5s infinite;
+                
+                &.small {
+                    animation: blink-#{$name}-small 0.5s infinite;
+                }
+                
+                &.big {
+                    animation: blink-#{$name}-big 0.5s infinite;
+                }
+            }
+        } 
+    }
+}

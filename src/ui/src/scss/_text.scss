@@ -1,0 +1,29 @@
+$colors: (
+    "success": lime,
+    "danger": red,
+    "info": blue,
+    "warning": yellow
+) !default;
+
+$text-transform: (capitalize, lowercase, uppercase);
+
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+@each $name, $color in $colors {
+    .text-#{$name} {
+        color: $color !important;
+    }
+}
+
+@each $type in $text-transform {
+    .text-transform-#{$type} {
+        text-transform: $type !important;
+    }
+}

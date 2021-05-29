@@ -1,0 +1,170 @@
+<!-- http://www.stryder-it.de/simdashboard/designs/view?id=27ug&page=2&tag= -->
+
+<!--
+<ng-template #curDifference let-difference="difference">
+    <div id="curDifference" class="center-items"
+        [ngClass]="{'text-success': difference > 0, 'text-danger': difference < 0 }">
+        <span *ngIf="!difference || difference === 0">--</span>
+        <span *ngIf="difference !== 0">{{ floatToTime(difference) }}</span>
+    </div>
+</ng-template>
+<ng-container *ngTemplateOutlet="curDifference;context:{difference: calcLapDifference(lapData?.bestLapTime)}">
+</ng-container>
+-->
+
+<!-- -- TEMPLATES -- -->
+<ng-template #multiPurposeLed>
+    <div class="led big"
+        [ngClass]="{'yellow blink': carStatusData?.drsAllowed === 1 && !carTelemetryData?.drs, 'green': carTelemetryData?.drs || false, 'blue': carStatusData?.pitLimiterOn || false, 'on': carTelemetryData?.drs || false || carStatusData?.pitLimiterOn}">
+    </div>
+</ng-template>
+
+<ng-template #flagLed>
+    <div *ngFor="let num of [0,1,2,3,4]" class="led small d-block my-1"
+        [ngClass]="{'green': carStatusData?.vehicleFiaFlags === 1, 'blue': carStatusData?.vehicleFiaFlags === 2, 'yellow': carStatusData?.vehicleFiaFlags === 3, 'red': carStatusData?.vehicleFiaFlags === 4, 'on blink': carStatusData?.vehicleFiaFlags >= 1}">
+    </div>
+</ng-template>
+
+<ng-template #tyreTemp let-id="id" let-compoundInfo="compoundInfo" let-temperature="temperature">
+    <div id="{{ id }}" class="center-items"
+        [ngClass]="{'text-success': temperature >= compoundInfo?.temperature[0] && temperature <= compoundInfo?.temperature[1], 'text-danger': temperature > compoundInfo?.temperature[1], 'text-warning': temperature < compoundInfo?.temperature[0]}">
+        {{ temperature || '--' }}</div>
+</ng-template>
+
+<ng-template #esrInfo let-esrUsage="esrUsage">
+    <div *ngIf="carStatusData?.ersStoreEngery !== 0" class="d-grid grid-3 my-4 ers-info">
+        <div id="ersDeployMode"><i class="fas fa-bolt"></i> {{ carStatusData?.ersDeployMode || 0 }}</div>
+        <div class="progressbar ers">
+            <div id="ersPercent" [style.width]="esrUsage + '%'"></div>
+        </div>
+        <div id="ersPercentLabel">{{ esrUsage }}%</div>
+    </div>
+</ng-template>
+
+<ng-template #fuelInfo let-reserve="reserve">
+    <div class="d-grid grid-3 my-4 fuel-info">
+        <div id="fuelMix"><i class="fas fa-gas-pump"
+                [ngClass]="{'text-success': reserve > 0, 'text-danger': reserve < 0}"></i>
+            {{ carStatusData?.fuelMix || 0 }}</div>
+        <div class="progressbar fuel">
+            <div id="fuelPercent" [style.width]="(100 / carStatusData?.fuelCapacity * carStatusData?.fuelInTank) + '%'">
+            </div>
+        </div>
+        <div id="fuelLabel" [ngClass]="{'text-success': reserve > 0, 'text-danger': reserve < 0}">
+            {{ 'fuelMass' | translate:{mass: (carStatusData?.fuelInTank || 0) | number: '1.0-1'} }}
+        </div>
+    </div>
+</ng-template>
+<!-- -- TEMPLATES -- -->
+
+<div class="screen-center">
+    <div id="dashboard" class="m-2">
+        <div class="d-grid grid-3 led-stripe">
+            <div class="center-items mb-3">
+                <ng-container *ngTemplateOutlet="multiPurposeLed;context"></ng-container>
+            </div>
+            <div class="center-items mb-3">
+                <div id="revLights">
+                    <ng-container *ngFor="let color of ['green', 'red', 'blue']; let i = index">
+                        <div *ngFor="let num of [0, 1, 2, 3, 4]" class="led {{ color }} mx-1"
+                            [ngClass]="{'on' : (carTelemetryData?.revLightsPercent || 0) >= 100 / 15 * ((num + i * 5) + 1)}">
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+            <div class="center-items mb-3">
+                <ng-container *ngTemplateOutlet="multiPurposeLed;context"></ng-container>
+            </div>
+        </div>
+
+        <div class="d-grid grid-3">
+            <div class="d-grid border border-thicker info-box">
+                <div class="d-grid grid-2 border border-thick tyre-speed-box bg-gray">
+                    <div class="border-right text-center">
+                        <div id="tyreCompound"
+                            [class]="getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17)?.short">
+                            <span>{{ getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17)?.short }}</span>
+                        </div>
+                        <div id="tyresDamage">{{ tyresDamage }}%</div>
+                    </div>
+                    <div class="text-right">
+                        <div id="speed">{{ carTelemetryData?.speed || 0 }} KM/H</div>
+                    </div>
+                </div>
+                <div class="d-grid grid-2 border border-inset border-thick">
+                    <div>
+                        <div id="currentLapNum" class="center-items">
+                            {{ 'lap' | translate:{lap: lapData?.currentLapNum || 0} }}</div>
+                        <div id="bestLapTime" class="center-items">
+                            <span *ngIf="!lapData?.bestLapTime || lapData?.bestLapTime === 0">--</span>
+                            <span
+                                *ngIf="lapData?.bestLapTime && lapData?.bestLapTime !== 0">{{ floatToTime(lapData?.bestLapTime) }}</span>
+                        </div>
+
+                    </div>
+                    <div>
+                        <div id="carPosition" class="center-items">
+                            {{ 'position' | translate:{position: lapData?.carPosition || 0} }}</div>
+                        <div id="difference" class="center-items"
+                            [ngClass]="{'text-success': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime >= 0, 'text-danger': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime < 0 }">
+                            <span *ngIf="!lapData?.bestLapTime || !lapData?.lastLapTime">--</span>
+                            <span
+                                *ngIf="lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime !== 0">{{ floatToTime(lapData?.bestLapTime - lapData?.lastLapTime) }}</span>
+                            <span
+                                *ngIf="lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime === 0">{{ floatToTime(lapData?.bestLapTime) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="d-grid grid-3">
+                    <div class="justify-self-start align-self-center pl-2">
+                        <ng-container *ngTemplateOutlet="flagLed;context"></ng-container>
+                    </div>
+                    <div id="gear"
+                        [ngClass]="{'text-warning': (carTelemetryData?.revLightsPercent || 0) >= 70 && (carTelemetryData?.revLightsPercent || 0) < 90, 'text-danger': (carTelemetryData?.revLightsPercent || 0) >= 90}">
+                        {{ !carTelemetryData || !carTelemetryData?.gear || carTelemetryData?.gear === 0 ? 'N' : carTelemetryData?.gear === -1 ? 'R' : carTelemetryData?.gear }}
+                    </div>
+                    <div class="justify-self-end align-self-center pr-2">
+                        <ng-container *ngTemplateOutlet="flagLed;context"></ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="d-grid border border-thicker info-box">
+                <div class="border border-thick text-center bg-gray">
+                    <div id="currentLapTime">{{ floatToTime(lapData?.currentLapTime || 0) }}</div>
+                </div>
+                <div class="d-grid grid-3 text-center border border-inset border-thick">
+                    <div>
+                        <ng-container
+                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreFrontLeftTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.frontLeft || 0}">
+                        </ng-container>
+                        <ng-container
+                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreFrontRightTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.frontRight || 0}">
+                        </ng-container>
+                    </div>
+                    <div class="center-items">
+                        <div class="d-grid">
+                            <div class="text-transform-uppercase">{{ 'engine.short' | translate }}</div>
+                            <div id="engineTemp"
+                                [ngClass]="{'text-success': carTelemetryData?.engineTemperature < 135, 'text-danger': carTelemetryData?.engineTemperature >= 135}">
+                                {{ carTelemetryData?.engineTemperature || '--' }}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <ng-container
+                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreRearLeftTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearLeft || 0}">
+                        </ng-container>
+                        <ng-container
+                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreRearRightTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearRight || 0}">
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <ng-container *ngTemplateOutlet="esrInfo;context:{esrUsage: calcESRUsage()}"></ng-container>
+        <ng-container *ngTemplateOutlet="fuelInfo;context:{reserve: calcFuelReserve()}"></ng-container>
+    </div>
+</div>

@@ -1,0 +1,366 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Dashboard</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+        }
+
+        *,
+        :after,
+        :before {
+            box-sizing: border-box;
+        }
+
+        .border {
+            border-width: 1px;
+            border-color: dimgray;
+            border-style: solid;
+        }
+
+        .border-thick {
+            border-width: 3px !important;
+        }
+
+        .border-thicker {
+            border-width: 5px !important;
+        }
+
+        .border-inset {
+            border-style: inset !important;
+        }
+
+        .border-top {
+            border-width: 1px 0 0 0;
+            border-color: dimgray;
+            border-style: solid;
+        }
+
+        .border-bottom {
+            border-width: 0 0 1px 0;
+            border-color: dimgray;
+            border-style: solid;
+        }
+
+        .border-left {
+            border-width: 0 0 0 1px;
+            border-color: dimgray;
+            border-style: solid;
+        }
+
+        .border-right {
+            border-width: 0 1px 0 0;
+            border-color: dimgray;
+            border-style: solid;
+        }
+
+        .text-center {
+            text-align: center !important;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+
+        .d-grid {
+            display: grid;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr) !important;
+        }
+
+        .info-box {
+            grid-template-rows: minmax(50px, auto) 3fr !important;
+        }
+
+        .tyre-speed-box {
+            grid-template-columns: minmax(80px, 1fr) 3fr !important;
+        }
+
+        .center-items {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .m-y {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .progressbar {
+            position: relative;
+            display: block;
+            background-color: dimgray;
+            height: 1rem;
+        }
+
+        .progressbar>div {
+            position: absolute;
+            display: block;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            background-color: lime;
+        }
+
+        .ers-info {
+            grid-template-columns: 1fr 4fr 1fr !important;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ers-info>*:nth-child(1) {
+            text-align: right;
+            padding: 0 0.5rem;
+        }
+
+        .ers-info>*:nth-child(3) {
+            text-align: left;
+            padding: 0 0.5rem;
+        }
+
+        .progressbar.ers {
+            height: 2rem;
+        }
+
+        .progressbar.ers>div {
+            background-color: yellow;
+        }
+
+        #speed,
+        #currentLapTime {
+            font-size: 2.5rem;
+        }
+
+        #tyreCompound::before {
+            content: "(";
+            font-weight: bold;
+        }
+
+        #tyreCompound::after {
+            content: ")";
+            font-weight: bold;
+        }
+
+        #tyreCompound.soft::before,
+        #tyreCompound.soft::after {
+            color: red;
+        }
+
+        #tyreCompound.medium::before,
+        #tyreCompound.medium::after {
+            color: yellow;
+        }
+
+        #tyreCompound.hard::before,
+        #tyreCompound.hard::after {
+            color: gray;
+        }
+
+	#tyreCompound.inter::before,
+        #tyreCompound.inter::after {
+            color: green;
+        }
+
+        #currentLapNum,
+        #fuel,
+        #carPosition,
+        #difference {
+            font-size: 2.5rem;
+            min-height: 50%;
+        }
+
+        #engineTemp {
+            font-size: 1.5rem;
+        }
+
+        #tyreFrontLeftTemp,
+        #tyreFrontRightTemp,
+        #tyreRearLeftTemp,
+        #tyreRearRightTemp {
+            font-size: 2.5rem;
+            min-height: 50%;
+        }
+
+        #engineTemp::after,
+        #tyreFrontLeftTemp::after,
+        #tyreFrontRightTemp::after,
+        #tyreRearLeftTemp::after,
+        #tyreRearRightTemp::after {
+            content: '\2103';
+        }
+
+        #gear {
+            font-weight: bold;
+            font-size: 12rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-grid grid-3">
+        <div class="d-grid border border-thicker info-box">
+            <div class="d-grid grid-2 border border-inset border-thick tyre-speed-box">
+                <div class="border-right text-center">
+                    <div id="tyreCompound" class="border-bottom medium">M</div>
+                    <div id="tyresDamage">0 %</div>
+                </div>
+                <div class="text-right">
+                    <div id="speed">0 KM/H</div>
+                </div>
+            </div>
+            <div class="d-grid grid-2 border border-inset border-thick">
+                <div>
+                    <div id="currentLapNum" class="center-items">0</div>
+                    <div id="fuel" class="center-items">0</div>
+                </div>
+                <div>
+                    <div id="carPosition" class="center-items">0</div>
+                    <div id="difference" class="center-items">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center">
+            <div id="gear">N</div>
+        </div>
+        <div class="d-grid border border-thicker info-box">
+            <div class="border border-inset border-thick text-center">
+                <div id="currentLapTime">00:00.000</div>
+            </div>
+            <div class="d-grid grid-3 text-center border border-inset border-thick">
+                <div>
+                    <div id="tyreFrontLeftTemp" class="center-items">0</div>
+                    <div id="tyreFrontRightTemp" class="center-items">0</div>
+                </div>
+                <div class="center-items">
+                    <div class="d-grid">
+                        <div>ENG</div>
+                        <div id="engineTemp">0</div>
+                    </div>
+                </div>
+                <div>
+                    <div id="tyreRearLeftTemp" class="center-items">0</div>
+                    <div id="tyreRearRightTemp" class="center-items">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-grid grid-3 m-y ers-info">
+        <div id="ersDeployMode">0</div>
+        <div class="progressbar ers">
+            <div id="ersPercent"></div>
+        </div>
+        <div id="ersPercentLabel">0%</div>
+    </div>
+
+    <script type="text/javascript">
+        var tyreCompCls = ["hsoft", "usoft", "ssoft", "soft", "medium", "hard", "shard", "inter", "wet"];
+        var ersStoreEngeryMax = 0;
+
+        function playerCarIndex(packet) {
+            return packet && packet.header ? packet.header.playerCarIndex : -1;
+        }
+
+        function floatToTime(float) {
+            var minutes = Math.floor(float / 60);
+            var seconds = float % 60;
+
+            return (minutes.toString().length < 2 ? "0" : "") + minutes + ":" + (Math.floor(seconds).toString().length < 2 ? "0" : "") + seconds.toFixed(3);
+        }
+
+        (function () {
+            var ws = new WebSocket("ws://localhost:8085/ws/telemetry");
+            ws.onmessage = function (event) {
+                var packet = JSON.parse(event.data);
+
+                if (packet.carTelemetryData) {
+                    var ctd = packet.carTelemetryData[playerCarIndex(packet)];
+
+                    document.getElementById("speed").innerText = ctd.speed + " KM/H";
+                    document.getElementById("gear").innerText = ctd.gear === -1 ? "R" : ctd.gear === 0 ? "N" : ctd.gear;
+
+                    document.getElementById("engineTemp").innerText = ctd.engineTemperature;
+
+                    document.getElementById("tyreFrontLeftTemp").innerText = ctd.tyreInnerTemperature.frontLeft;
+                    document.getElementById("tyreFrontRightTemp").innerText = ctd.tyreInnerTemperature.frontRight;
+                    document.getElementById("tyreRearLeftTemp").innerText = ctd.tyreInnerTemperature.rearLeft;
+                    document.getElementById("tyreRearRightTemp").innerText = ctd.tyreInnerTemperature.rearRight;
+                } else if (packet.carStatuses) {
+                    var csd = packet.carStatuses[playerCarIndex(packet)];
+
+                    document.getElementById("tyresDamage").innerText = Math.max(csd.tyresDamage.frontLeft, csd.tyresDamage.frontRight, csd.tyresDamage.rearLeft, csd.tyresDamage.rearRight) + "%";
+
+                    var tcElm = document.getElementById("tyreCompound");
+
+                    tyreCompCls.forEach(function (i) {
+                        tcElm.classList.remove(i);
+                    });
+                    tcElm.classList.add(tyreCompCls[csd.tyreCompound]);
+
+                    switch (csd.tyreCompound) {
+                        case 0:
+                            tcElm.innerText = "HS";
+                            break;
+                        case 1:
+                            tcElm.innerText = "US";
+                            break;
+                        case 2:
+                            tcElm.innerText = "SS";
+                            break;
+                        case 3:
+                            tcElm.innerText = "S";
+                            break;
+                        case 4:
+                            tcElm.innerText = "M";
+                            break;
+                        case 5:
+                            tcElm.innerText = "H";
+                            break;
+                        case 6:
+                            tcElm.innerText = "SH";
+                            break;
+                        case 7:
+                            tcElm.innerText = "I";
+                            break;
+                        case 8:
+                            tcElm.innerText = "W";
+                            break;
+                    }
+
+
+                    document.getElementById("ersDeployMode").innerText = csd.ersDeployMode;
+
+                    ersStoreEngeryMax = Math.max(ersStoreEngeryMax, csd.ersStoreEngery);
+                    var ersPercent = Math.floor(100 / ersStoreEngeryMax * csd.ersStoreEngery);
+                    document.getElementById("ersPercent").style.width = isNaN(ersPercent) ? "100%" : ersPercent.toString() + "%";
+                    document.getElementById("ersPercentLabel").innerText = isNaN(ersPercent) ? "100%" : ersPercent.toString() + "%";
+                } else if (packet.lapDataList) {
+                    var ldl = packet.lapDataList[playerCarIndex(packet)];
+
+                    document.getElementById("currentLapTime").innerText = floatToTime(ldl.currentLapTime);
+                    document.getElementById("currentLapNum").innerText = "L" + ldl.currentLapNum;
+                    document.getElementById("carPosition").innerText = "P" + ldl.carPosition;
+                }
+            }
+        })();
+    </script>
+</body>
+
+</html>

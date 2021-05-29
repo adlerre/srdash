@@ -1,0 +1,9 @@
+{
+    "engine": {
+        "label": "Engine",
+        "short": "Eng"
+    },
+    "fuelMass": "{mass} kg",
+    "lap": "R{lap}",
+    "position": "P{position}"
+}

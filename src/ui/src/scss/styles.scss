@@ -1,0 +1,197 @@
+@import "./variables";
+
+@import "./border";
+@import "./flex";
+@import "./display";
+@import "./text";
+@import "./spacing";
+
+@import "./led";
+@import "./progress";
+
+/*
+ * FontAwesome
+ */
+$fa-font-path: "../../../../node_modules/@fortawesome/fontawesome-free/webfonts/";
+
+@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
+//@import "~@fortawesome/fontawesome-free/scss/brands.scss";
+@import "~@fortawesome/fontawesome-free/scss/solid.scss";
+@import "~@fortawesome/fontawesome-free/scss/regular.scss";
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial;
+}
+
+body {
+    background-color: #000;
+    color: #fff;
+}
+
+*, :after, :before {
+    box-sizing: border-box;
+}
+
+.screen-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+}
+
+.bg-gray {
+    background-color: dimgray;
+}
+
+.grid-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+}
+
+.grid-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+}
+
+.info-box {
+    grid-template-rows: minmax(50px, auto) 3fr !important;
+}
+
+.tyre-speed-box {
+    grid-template-columns: minmax(80px, 1fr) 3fr !important;
+}
+
+.center-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.led-stripe {
+    grid-template-columns: 1fr 4fr 1fr !important;
+    justify-content: center;
+    align-items: center;
+}
+
+.ers-info {
+    grid-template-columns: 1fr 4fr 1fr !important;
+    justify-content: center;
+    align-items: center;
+    
+    color: yellow;
+    font-size: 1.4rem;
+    
+    >*:nth-child(1) {
+        text-align: right;
+        padding: 0 0.5rem;
+    }
+
+    >*:nth-child(3) {
+        text-align: left;
+        padding: 0 0.5rem;
+    }
+
+    .progressbar {
+        height: 2rem;
+        
+        >div {
+            background-color: yellow;
+        }
+    }
+}
+
+.fuel-info {
+    grid-template-columns: 1fr 4fr 1fr !important;
+    justify-content: center;
+    align-items: center;
+    
+    color: lime;
+    font-size: 1.4rem;
+    
+    >*:nth-child(1) {
+        text-align: right;
+        padding: 0 0.5rem;
+    }
+
+    >*:nth-child(3) {
+        color: #fff;
+        text-align: left;
+        padding: 0 0.5rem;
+    }
+
+    .progressbar {
+        height: 2rem;
+        
+        >div {
+            background-color: lime;
+        }
+    }
+}
+
+#tyreCompound {
+    min-height: 50%;
+    
+    &::before {
+        content: "(";
+        font-weight: bold;
+    }
+    
+    &::after {
+        content: ")";
+        font-weight: bold;
+    }
+    
+    @each $name, $color in $tyreCompounds {
+        &.#{$name} {
+            &::before, &::after {
+                color: $color;
+            }
+        }    
+    }
+}
+
+#tyresDamage {
+    min-height: 50%;
+}
+
+#speed,
+#currentLapTime {
+    font-size: 2.5rem;
+}
+
+#bestLapTime,
+#currentLapNum,
+#curDifference,
+#carPosition,
+#difference {
+    font-size: 2rem;
+    min-height: 50%;
+}
+
+#engineTemp {
+    font-size: 1.5rem;
+}
+
+#tyreFrontLeftTemp,
+#tyreFrontRightTemp,
+#tyreRearLeftTemp,
+#tyreRearRightTemp {
+    font-size: 2rem;
+    min-height: 50%;
+}
+
+#engineTemp::after,
+#tyreFrontLeftTemp::after,
+#tyreFrontRightTemp::after,
+#tyreRearLeftTemp::after,
+#tyreRearRightTemp::after {
+    content: '\2103';
+    padding-left: 0.25rem;
+}
+
+#gear {
+    font-weight: bold;
+    font-size: 12rem;
+}

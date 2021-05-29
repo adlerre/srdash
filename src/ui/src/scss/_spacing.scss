@@ -1,0 +1,33 @@
+$spacer: 0.25rem !default;
+
+$spacingTypes: (
+    "m": "margin",
+    "p": "padding"
+);
+
+$spacingSites: (
+    "t": ( "top" ),
+    "b": ( "bottom" ),
+    "l": ( "left" ),
+    "r": ( "right" ),
+    "x": ( "left", "right" ),
+    "y": ( "top", "bottom" )
+);
+
+@each $typeName, $type in $spacingTypes {
+    @each $size in (0,1,2,3,4,5) {
+        .#{$typeName}-#{$size} {
+            #{$type}: $spacer * $size !important;
+        }    
+    };
+    
+    @each $siteName, $sites in $spacingSites {
+        @each $size in (0,1,2,3,4,5) {
+            .#{$typeName}#{$siteName}-#{$size} {
+                @each $site in $sites {
+                    #{$type}-#{$site}: $spacer * $size !important;    
+                };
+            }
+        };
+    };
+};

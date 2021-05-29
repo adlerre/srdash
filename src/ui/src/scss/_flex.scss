@@ -1,0 +1,16 @@
+$flexAlignTypes: (
+    "justify": ( start, end, center, between, around, evenly ),
+    "align": ( start, end, center, baseline, stretch )
+);
+
+@each $name, $types in $flexAlignTypes {
+    @each $type in $types {
+        .#{$name}-#{$type} {
+            #{$name}-content: $type !important;
+        }
+        
+        .#{$name}-self-#{$type} {
+            #{$name}-self: $type !important;
+        }
+    };
+};
