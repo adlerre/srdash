@@ -2,11 +2,23 @@ $colors: (
     "success": lime,
     "danger": red,
     "info": blue,
-    "warning": yellow
+    "warning": yellow,
+    "muted": #6c757d
 ) !default;
 
-$text-transform: (capitalize, lowercase, uppercase);
+$font-size-base: 1rem !default;
+$font-size-step: 0.25 !default;
+$font-sizes: (1,2,3,4,5,6);
 
+$font-weight: ( 
+    bold: 700, 
+    bolder: bolder, 
+    normal: 400, 
+    light: 300, 
+    lighter: lighter
+);
+
+$text-transform: (capitalize, lowercase, uppercase);
 
 .text-center {
     text-align: center !important;
@@ -27,3 +39,16 @@ $text-transform: (capitalize, lowercase, uppercase);
         text-transform: $type !important;
     }
 }
+
+@each $size in $font-sizes {
+    .fs-#{$size} {
+        font-size: $font-size-base + (length($font-sizes) - $size) * $font-size-step;
+    }
+}
+
+@each $name, $value in $font-weight {
+    .fw-#{$name} {
+        font-weight: $value !important;
+    }
+}
+

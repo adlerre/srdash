@@ -1,16 +1,52 @@
 $flexAlignTypes: (
-    "justify": ( start, end, center, between, around, evenly ),
-    "align": ( start, end, center, baseline, stretch )
+    "align-content": (
+        start: flex-start,
+        end: flex-end,
+        center: center,
+        baseline: baseline,
+        stretch: stretch,
+        around: space-around,
+        between: space-between,
+        evenly: space-evenly
+    ),
+    
+    "align-items": (
+        start: flex-start,
+        end: flex-end,
+        center: center,
+        baseline: baseline,
+        stretch: stretch
+    ),
+    
+    "align-self": (
+        start: flex-start,
+        end: flex-end,
+        center: center,
+        baseline: baseline,
+        stretch: stretch
+    ),
+    
+    "justify-content": (
+        start: flex-start, 
+        end: flex-end, 
+        center: center, 
+        between: space-between, 
+        around: space-around, 
+        evenly: space-evently   
+    ),
+    
+    "justify-self": (
+        start: start, 
+        end: end, 
+        center: center,
+        stretch: stretch 
+    ),
 );
 
 @each $name, $types in $flexAlignTypes {
-    @each $type in $types {
+    @each $type, $value in $types {
         .#{$name}-#{$type} {
-            #{$name}-content: $type !important;
-        }
-        
-        .#{$name}-self-#{$type} {
-            #{$name}-self: $type !important;
+            #{$name}: $value !important;
         }
     };
 };
