@@ -1,8 +1,7 @@
 import { Component, ViewChild, OnInit } from "@angular/core";
-import { StateService, UIRouterGlobals } from "@uirouter/core";
 import { TranslateService } from "@ngx-translate/core";
 
-import { of } from "rxjs";
+import { ApiService } from "./_services/api.service";
 
 @Component({
     selector: "ui-root",
@@ -11,8 +10,10 @@ import { of } from "rxjs";
 export class AppComponent implements OnInit {
 
     private langs = ["de", "en"];
+    
+    public gitInfo: any;
 
-    constructor(public translate: TranslateService, private $state: StateService, private globals: UIRouterGlobals) {
+    constructor(private $api: ApiService, public translate: TranslateService) {
         translate.addLangs(this.langs);
         translate.setDefaultLang(this.langs[0]);
 
@@ -22,6 +23,7 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.$api.gitInfo().subscribe(gitInfo => this.gitInfo = gitInfo);
     }
 
 }

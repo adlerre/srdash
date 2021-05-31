@@ -11,6 +11,7 @@ import { UIRouterModule } from "@uirouter/angular";
 
 import { routerConfigFn } from "./_helpers/router.config";
 
+import { ApiService } from "./_services/api.service";
 import { AppComponent } from "./app.component";
 
 import { WebsocketService } from "./_services/websocket.service";
@@ -66,6 +67,7 @@ export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFo
                 strictNumberSign: false
             }
         },
+        ApiService,
         WebsocketService
     ],
     bootstrap: [AppComponent]
