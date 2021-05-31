@@ -94,8 +94,11 @@
                 <div class="d-grid grid-2 border border-inset border-thick">
                     <div>
                         <div id="currentLapNum" class="center-items">
-                            {{ 'lap' | translate:{lap: lapData?.currentLapNum || 0} }}</div>
-                        <div id="bestLapTime" class="center-items">
+                            <span>{{ 'lap' | translate:{lap: lapData?.currentLapNum || '--'} }}</span>
+                            <span *ngIf="sessionData?.totalLaps"> / {{ sessionData?.totalLaps }}</span>
+                        </div>
+                        <div id="bestLapTime" class="center-items"
+                            [ngClass]="{'text-success': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime === 0}">
                             <span *ngIf="!lapData?.bestLapTime || lapData?.bestLapTime === 0">--</span>
                             <span
                                 *ngIf="lapData?.bestLapTime && lapData?.bestLapTime !== 0">{{ floatToTime(lapData?.bestLapTime) }}</span>
@@ -104,14 +107,14 @@
                     </div>
                     <div>
                         <div id="carPosition" class="center-items">
-                            {{ 'position' | translate:{position: lapData?.carPosition || 0} }}</div>
+                            <span>{{ 'position' | translate:{position: lapData?.carPosition || '--'} }}</span>
+                        </div>
                         <div id="difference" class="center-items"
-                            [ngClass]="{'text-success': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime >= 0, 'text-danger': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime < 0 }">
-                            <span *ngIf="!lapData?.bestLapTime || !lapData?.lastLapTime">--</span>
+                            [ngClass]="{'text-success': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime > 0, 'text-danger': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime < 0 }">
+                            <span
+                                *ngIf="(!lapData?.bestLapTime || !lapData?.lastLapTime) || (lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime === 0)">--</span>
                             <span
                                 *ngIf="lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime !== 0">{{ floatToTime(lapData?.bestLapTime - lapData?.lastLapTime) }}</span>
-                            <span
-                                *ngIf="lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime === 0">{{ floatToTime(lapData?.bestLapTime) }}</span>
                         </div>
                     </div>
                 </div>
