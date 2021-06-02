@@ -95,7 +95,7 @@
                     <div>
                         <div id="currentLapNum" class="center-items">
                             <span>{{ 'lap' | translate:{lap: lapData?.currentLapNum || '--'} }}</span>
-                            <span *ngIf="sessionData?.totalLaps"> / {{ sessionData?.totalLaps }}</span>
+                            <span *ngIf="sessionData?.totalLaps && sessionData?.totalLaps > 1"> / {{ sessionData?.totalLaps }}</span>
                         </div>
                         <div id="bestLapTime" class="center-items"
                             [ngClass]="{'text-success': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime === 0}">
