@@ -1,10 +1,4 @@
-$colors: (
-    "success": lime,
-    "danger": red,
-    "info": blue,
-    "warning": yellow,
-    "muted": #6c757d
-) !default;
+$text-colors: $colors !default;
 
 $font-size-base: 1rem !default;
 $font-size-step: 0.25 !default;
@@ -28,7 +22,7 @@ $text-transform: (capitalize, lowercase, uppercase);
     text-align: right !important;
 }
 
-@each $name, $color in $colors {
+@each $name, $color in $text-colors {
     .text-#{$name} {
         color: $color !important;
     }
