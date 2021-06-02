@@ -1,6 +1,7 @@
 @import "./variables";
 
 @import "./border";
+@import "./button";
 @import "./flex";
 @import "./display";
 @import "./text";
@@ -32,6 +33,10 @@ body {
 
 *, :after, :before {
     box-sizing: border-box;
+}
+
+#main {
+    user-select: none;
 }
 
 footer {
@@ -75,6 +80,27 @@ footer {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#system-modal {
+    .modal-body {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
+        
+        min-width: 30%;
+        
+        button {
+            width: 100%;
+            
+            & + button {
+                margin-left: 0.5rem;  
+            }
+        }
+        
+    }
 }
 
 .led-stripe {

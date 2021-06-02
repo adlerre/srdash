@@ -1,4 +1,20 @@
-<ui-view></ui-view>
+<div id="main" (dblclick)="onDblClick($event)">
+    <ui-view></ui-view>
+</div>
 <footer class="d-flex justify-content-end px-1">
-    <div class="fw-lighter text-muted"><small>{{ gitInfo['git.commit.id.describe'] }}</small></div>
+    <div *ngIf="gitInfo" class="fw-lighter text-muted"><small>{{ gitInfo['git.commit.id.describe'] }}</small></div>
 </footer>
+
+<ui-modal id="system-modal">
+    <h1 class="my-1">{{ 'modal.system.title' | translate }}</h1>
+    <div class="d-flex justify-content-around">
+        <button class="btn btn-big" (click)="doReboot($event)">
+            <i class="icon fas fa-sync"></i>
+            <span class="pl-1">{{ 'modal.system.button.reboot' | translate}}</span>
+        </button>
+        <button class="btn btn-big btn-danger" (click)="doShutdown($event)">
+            <i class="icon fas fa-power-off"></i>
+            <span class="pl-1">{{ 'modal.system.button.shutdown' | translate}}</span>
+        </button>
+    </div>
+</ui-modal>

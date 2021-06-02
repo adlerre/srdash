@@ -5,5 +5,14 @@
     },
     "fuelMass": "{mass} kg",
     "lap": "R{lap}",
-    "position": "P{position}"
+    "position": "P{position}",
+    "modal": {
+        "system": {
+            "title": "System",
+            "button": {
+                "reboot": "Neustart",
+                "shutdown": "Herunterfahren"
+            }
+        }
+    }
 }

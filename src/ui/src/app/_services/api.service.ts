@@ -100,6 +100,17 @@ export class ApiService {
     }
 
     /**
+     * System
+     */
+     doReboot() {
+        return this.$http.put(`${this.base}/system/reboot`, this.httpOptions);
+    }
+    
+    doShutdown() {
+        return this.$http.put(`${this.base}/system/shutdown`, this.httpOptions);
+    }
+
+    /**
      * External Assets
      */
     gitInfo() {

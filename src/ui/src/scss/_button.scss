@@ -1,0 +1,75 @@
+$button-colors: $colors !default;
+
+$button-bg-color: #c0c0c0;
+
+$button-padding: .5rem !default;
+$button-font-size: 1rem !default;
+
+@function set-color($color) {
+    @if (lightness($color) > 40) {
+      @return #000;
+    }
+    @else {
+      @return #FFF;
+    }
+}
+
+.btn {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+
+    touch-action: manipulation;
+    user-select: none;
+
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    text-align: center;
+    border: 0;
+    border-radius: 3px;
+
+    transition: all 250ms ease-in-out;
+    
+    padding: $button-padding;
+    
+    font-size: $button-font-size;
+    
+    background-color: $button-bg-color;
+    color: set-color($button-bg-color);
+        
+    &:hover, &:active {
+        $bgDark: darken($button-bg-color, 20%);
+        background-color: $bgDark !important;
+        color: set-color($bgDark) !important;
+    }
+    
+    @each $name, $color in $button-colors {
+        &.btn-#{$name} {
+            background-color: $color !important;
+            color: set-color($color) !important;
+            
+            &:hover, &:active {
+                $bgDark: darken($color, 20%);
+                background-color: $bgDark !important;
+                color: set-color($bgDark) !important;
+            }   
+        }
+    }
+    
+    > .icon {
+        display: block;
+        font-size: $button-font-size * 2;
+    }
+
+    
+    &.btn-big {
+        padding: $button-padding * 4;
+        font-size: $button-font-size * 1.5;
+        
+        > .icon {
+            display: block;
+            font-size: $button-font-size * 4;
+        }
+    }
+}
