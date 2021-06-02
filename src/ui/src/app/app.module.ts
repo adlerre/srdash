@@ -11,6 +11,8 @@ import { UIRouterModule } from "@uirouter/angular";
 
 import { routerConfigFn } from "./_helpers/router.config";
 
+import { ModalModule } from "./_modal";
+
 import { ApiService } from "./_services/api.service";
 import { AppComponent } from "./app.component";
 
@@ -36,6 +38,7 @@ export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFo
         BrowserAnimationsModule,
         HttpClientModule,
         FormsModule,
+        ModalModule,
         ReactiveFormsModule,
         TranslateModule.forRoot({
             loader: {

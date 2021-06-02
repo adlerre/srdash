@@ -1,0 +1,47 @@
+/* MODAL STYLES
+-------------------------------*/
+ui-modal {
+    display: none;
+
+    .modal {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        z-index: 1000;
+        
+        overflow: auto;
+        
+        -webkit-backdrop-filter: blur(5px);
+        backdrop-filter: blur(5px);
+
+        .modal-body {
+            padding: 20px;
+            background: #fff;
+            color: #000;
+
+            margin: 40px;
+            
+            border-radius: 6px;
+        }
+    }
+
+    .modal-background {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        background-color: #000;
+        opacity: 0.75;
+        
+        z-index: 900;
+    }
+}
+
+body.modal-open {
+    overflow: hidden;
+}
