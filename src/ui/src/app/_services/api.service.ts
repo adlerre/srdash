@@ -102,10 +102,10 @@ export class ApiService {
     /**
      * System
      */
-     doReboot() {
+    doReboot() {
         return this.$http.put(`${this.base}/system/reboot`, this.httpOptions);
     }
-    
+
     doShutdown() {
         return this.$http.put(`${this.base}/system/shutdown`, this.httpOptions);
     }
