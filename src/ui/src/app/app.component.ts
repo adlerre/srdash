@@ -3,7 +3,7 @@ import { TranslateService } from "@ngx-translate/core";
 
 import { ModalService } from "./_modal";
 
-import { ApiService } from "./_services/api.service";
+import { ApiService } from "./_services";
 
 @Component({
     selector: "ui-root",

@@ -13,12 +13,12 @@ import { routerConfigFn } from "./_helpers/router.config";
 
 import { ModalModule } from "./_modal";
 
-import { ApiService } from "./_services/api.service";
+import { ApiService } from "./_services";
 import { AppComponent } from "./app.component";
 
 import { WebsocketService } from "./_services/websocket.service";
 
-import { DashboardComponent, DashboardStates } from "./dashboard/dashboard.component";
+import { DashboardComponent, DashboardStates } from "./dashboard";
 
 export function createTranslateLoader(http: HttpClient) {
     return new TranslateHttpLoader(http, "./assets/i18n/", ".json");
