@@ -18,8 +18,11 @@ package net.ef.srdash.frontend.resource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.function.BiFunction;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Singleton;
@@ -96,48 +99,33 @@ public class SystemResource {
         return res;
     }
 
+    private BiFunction<InputStream, StringBuffer, Thread> streamCaptureThread = (is, sb) -> {
+        return new Thread() {
+            @Override
+            public void run() {
+                try {
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(is, StandardCharsets.UTF_8));
+                    String line = null;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    reader.close();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+        };
+    };
+
     private ProcessResult runCommand(String cmd) throws IOException, InterruptedException {
         Process p = Runtime.getRuntime().exec(cmd);
 
         StringBuffer sbOut = new StringBuffer();
         StringBuffer sbErr = new StringBuffer();
 
-        Thread ioThreadOutput = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8));
-                    String line = null;
-                    while ((line = reader.readLine()) != null) {
-                        sbOut.append(line);
-                    }
-                    reader.close();
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-            }
-        };
-
-        Thread ioThreadError = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(p.getErrorStream(), StandardCharsets.UTF_8));
-                    String line = null;
-                    while ((line = reader.readLine()) != null) {
-                        sbErr.append(line);
-                    }
-                    reader.close();
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-            }
-        };
-
-        ioThreadOutput.start();
-        ioThreadError.start();
+        streamCaptureThread.apply(p.getInputStream(), sbOut).start();
+        streamCaptureThread.apply(p.getErrorStream(), sbErr).start();
 
         p.waitFor();
 
