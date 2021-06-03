@@ -4,6 +4,8 @@ A Java app to consume UDP telemetry data from Codemaster's F1 2018/2019 video ga
 
 Project based on work of [eh7n](https://github.com/eh7n/f1-2018_telemetry).
 
+![Screenshot](./doc/screenshot.png)
+
 ## Usage
 
 Run on commandline with:
