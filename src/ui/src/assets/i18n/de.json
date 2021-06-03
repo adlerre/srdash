@@ -1,11 +1,13 @@
 {
-    "engine": {
-        "label": "Motor",
-        "short": "Eng"
+    "dashboard": {
+        "engine": {
+            "label": "Motor",
+            "short": "Eng"
+        },
+        "fuelMass": "{mass} kg",
+        "lap": "R{lap}",
+        "position": "P{position}"
     },
-    "fuelMass": "{mass} kg",
-    "lap": "R{lap}",
-    "position": "P{position}",
     "modal": {
         "system": {
             "title": "System",

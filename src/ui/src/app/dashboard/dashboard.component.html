@@ -51,7 +51,7 @@
             </div>
         </div>
         <div id="fuelLabel" [ngClass]="{'text-success': reserve > 0, 'text-danger': reserve < 0}">
-            {{ 'fuelMass' | translate:{mass: (carStatusData?.fuelInTank || 0) | number: '1.0-1'} }}
+            {{ 'dashboard.fuelMass' | translate:{mass: (carStatusData?.fuelInTank || 0) | number: '1.0-1'} }}
         </div>
     </div>
 </ng-template>
@@ -94,7 +94,7 @@
                 <div class="d-grid grid-2 border border-inset border-thick">
                     <div>
                         <div id="currentLapNum" class="center-items">
-                            <span>{{ 'lap' | translate:{lap: lapData?.currentLapNum || '--'} }}</span>
+                            <span>{{ 'dashboard.lap' | translate:{lap: lapData?.currentLapNum || '--'} }}</span>
                             <span *ngIf="sessionData?.totalLaps && sessionData?.totalLaps > 1"> / {{ sessionData?.totalLaps }}</span>
                         </div>
                         <div id="bestLapTime" class="center-items"
@@ -107,7 +107,7 @@
                     </div>
                     <div>
                         <div id="carPosition" class="center-items">
-                            <span>{{ 'position' | translate:{position: lapData?.carPosition || '--'} }}</span>
+                            <span>{{ 'dashboard.position' | translate:{position: lapData?.carPosition || '--'} }}</span>
                         </div>
                         <div id="difference" class="center-items"
                             [ngClass]="{'text-success': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime > 0, 'text-danger': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime < 0 }">
@@ -148,7 +148,7 @@
                     </div>
                     <div class="center-items">
                         <div class="d-grid">
-                            <div class="text-transform-uppercase">{{ 'engine.short' | translate }}</div>
+                            <div class="text-transform-uppercase">{{ 'dashboard.engine.short' | translate }}</div>
                             <div id="engineTemp"
                                 [ngClass]="{'text-success': carTelemetryData?.engineTemperature < 135, 'text-danger': carTelemetryData?.engineTemperature >= 135}">
                                 {{ carTelemetryData?.engineTemperature || '--' }}</div>
