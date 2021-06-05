@@ -45,13 +45,15 @@
     <div class="d-grid grid-3 my-4 fuel-info">
         <div id="fuelMix"><i class="fas fa-gas-pump"
                 [ngClass]="{'text-success': reserve > 0, 'text-danger': reserve < 0}"></i>
-            {{ carStatusData?.fuelMix || 0 }}</div>
+            {{ carStatusData?.fuelMix + 1 || 0 }}</div>
         <div class="progressbar fuel">
             <div id="fuelPercent" [style.width]="(100 / carStatusData?.fuelCapacity * carStatusData?.fuelInTank) + '%'">
             </div>
         </div>
         <div id="fuelLabel" [ngClass]="{'text-success': reserve > 0, 'text-danger': reserve < 0}">
             {{ 'dashboard.fuelMass' | translate:{mass: (carStatusData?.fuelInTank || 0) | number: '1.0-1'} }}
+            <small *ngIf="carStatusData?.fuelRemainingLaps"
+                class="text-lighter">({{ (reserve > 0 ? '+' : reserve < 0 ? '-' : '') + (reserve | number: '1.2-2') }})</small>
         </div>
     </div>
 </ng-template>
@@ -95,7 +97,8 @@
                     <div>
                         <div id="currentLapNum" class="center-items">
                             <span>{{ 'dashboard.lap' | translate:{lap: lapData?.currentLapNum || '--'} }}</span>
-                            <span *ngIf="sessionData?.totalLaps && sessionData?.totalLaps > 1"> / {{ sessionData?.totalLaps }}</span>
+                            <span *ngIf="sessionData?.totalLaps && sessionData?.totalLaps > 1"> /
+                                {{ sessionData?.totalLaps }}</span>
                         </div>
                         <div id="bestLapTime" class="center-items"
                             [ngClass]="{'text-success': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime === 0}">
@@ -168,6 +171,8 @@
 
 
         <ng-container *ngTemplateOutlet="esrInfo;context:{esrUsage: calcESRUsage()}"></ng-container>
-        <ng-container *ngTemplateOutlet="fuelInfo;context:{reserve: calcFuelReserve()}"></ng-container>
+        <ng-container
+            *ngTemplateOutlet="fuelInfo;context:{reserve: carStatusData?.fuelRemainingLaps || calcFuelReserve()}">
+        </ng-container>
     </div>
 </div>

@@ -47,6 +47,7 @@ export interface CarStatusData {
     pitLimiterOn?: boolean;
     fuelInTank?: number;
     fuelCapacity?: number;
+    fuelRemainingLaps?: number;
     maxRpm?: number;
     idleRpm?: number;
     maxGears?: number;
