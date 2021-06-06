@@ -160,10 +160,10 @@
                     </div>
                     <div>
                         <ng-container
-                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreRearLeftTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearLeft || 0}">
+                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreRearLeftTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearLeft || 0}">
                         </ng-container>
                         <ng-container
-                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreRearRightTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearRight || 0}">
+                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreRearRightTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearRight || 0}">
                         </ng-container>
                     </div>
                 </div>
