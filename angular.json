@@ -3,7 +3,7 @@
     "version": 1,
     "newProjectRoot": "projects",
     "projects": {
-        "services-ui": {
+        "srdash-ui": {
             "root": "src/ui/src",
             "sourceRoot": "src/ui/src",
             "projectType": "application",
@@ -60,18 +60,18 @@
                 "serve": {
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "options": {
-                        "browserTarget": "services-ui:build"
+                        "browserTarget": "srdash-ui:build"
                     },
                     "configurations": {
                         "production": {
-                            "browserTarget": "services-ui:build:production"
+                            "browserTarget": "srdash-ui:build:production"
                         }
                     }
                 },
                 "extract-i18n": {
                     "builder": "@angular-devkit/build-angular:extract-i18n",
                     "options": {
-                        "browserTarget": "services-ui:build"
+                        "browserTarget": "srdash-ui:build"
                     }
                 },
                 "lint": {
@@ -87,7 +87,7 @@
                 }
             }
         },
-        "services-ui-e2e": {
+        "srdash-ui-e2e": {
             "root": "",
             "sourceRoot": "",
             "projectType": "application"
