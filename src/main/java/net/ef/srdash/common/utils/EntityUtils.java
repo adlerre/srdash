@@ -25,7 +25,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.TypeAnnotationsScanner;
