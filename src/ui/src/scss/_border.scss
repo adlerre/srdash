@@ -1,7 +1,13 @@
+$border-radius-sizes: (0,1,2,3,4,5);
+
 .border {
     border-width: 1px;
     border-color: dimgray;
     border-style: solid;
+}
+
+.border-light {
+    border-color: #909090;
 }
 
 .border-thick {
@@ -38,4 +44,10 @@
     border-width: 0 1px 0 0;
     border-color: dimgray;
     border-style: solid;
+}
+
+@each $size in $border-radius-sizes {
+    .border-radius-#{$size} {
+        border-radius: 0px + $size;   
+    }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.ef.srdash.telemetry.data.Packet;
+import net.ef.srdash.telemetry.data.PacketCarDamageData;
 import net.ef.srdash.telemetry.data.PacketCarSetupData;
 import net.ef.srdash.telemetry.data.PacketCarStatusData;
 import net.ef.srdash.telemetry.data.PacketCarTelemetryData;
@@ -12,7 +13,9 @@ import net.ef.srdash.telemetry.data.PacketLapData;
 import net.ef.srdash.telemetry.data.PacketMotionData;
 import net.ef.srdash.telemetry.data.PacketParticipantsData;
 import net.ef.srdash.telemetry.data.PacketSessionData;
+import net.ef.srdash.telemetry.data.PacketSessionHistoryData;
 import net.ef.srdash.telemetry.data.elements.ButtonStatus;
+import net.ef.srdash.telemetry.data.elements.CarDamageData;
 import net.ef.srdash.telemetry.data.elements.CarMotionData;
 import net.ef.srdash.telemetry.data.elements.CarSetupData;
 import net.ef.srdash.telemetry.data.elements.CarStatusData;
@@ -21,13 +24,16 @@ import net.ef.srdash.telemetry.data.elements.DriverStatus;
 import net.ef.srdash.telemetry.data.elements.Era;
 import net.ef.srdash.telemetry.data.elements.Header;
 import net.ef.srdash.telemetry.data.elements.LapData;
+import net.ef.srdash.telemetry.data.elements.LapHistoryData;
 import net.ef.srdash.telemetry.data.elements.MarshalZone;
 import net.ef.srdash.telemetry.data.elements.ParticipantData;
 import net.ef.srdash.telemetry.data.elements.PitStatus;
 import net.ef.srdash.telemetry.data.elements.ResultStatus;
 import net.ef.srdash.telemetry.data.elements.SafetyCarStatus;
 import net.ef.srdash.telemetry.data.elements.SessionType;
+import net.ef.srdash.telemetry.data.elements.TyreStintHistoryData;
 import net.ef.srdash.telemetry.data.elements.Weather;
+import net.ef.srdash.telemetry.data.elements.WeatherForecast;
 import net.ef.srdash.telemetry.data.elements.WheelData;
 import net.ef.srdash.telemetry.data.elements.ZoneFlag;
 
@@ -47,14 +53,16 @@ import net.ef.srdash.telemetry.data.elements.ZoneFlag;
  */
 public class PacketDeserializer {
 
-    public static final int TOTAL_NBR_CARS = 20;
-    public static final int MAX_NBR_MARSHAL_ZONES = 21;
-
+    public static final int F1_AUTO = -1;
     public static final int F1_2018 = 2018;
     public static final int F1_2019 = 2019;
+    public static final int F1_2020 = 2020;
+    public static final int F1_2021 = 2021;
 
     public static final int MAX_PACKET_SIZE_F1_2018 = 1341;
     public static final int MAX_PACKET_SIZE_F1_2019 = 1347;
+    public static final int MAX_PACKET_SIZE_F1_2020 = 1464; // don't know yet
+    public static final int MAX_PACKET_SIZE_F1_2021 = 2000; // don't know yet
 
     private int version;
 
@@ -72,7 +80,7 @@ public class PacketDeserializer {
      * @return a Packet POJO
      */
     public static Packet read(byte[] data) {
-        return read(data, F1_2018);
+        return read(data, F1_AUTO);
     }
 
     /**
@@ -91,9 +99,25 @@ public class PacketDeserializer {
             return MAX_PACKET_SIZE_F1_2019;
         case F1_2018:
             return MAX_PACKET_SIZE_F1_2018;
+        case F1_2020:
+            return MAX_PACKET_SIZE_F1_2020;
+        case F1_2021:
+            return MAX_PACKET_SIZE_F1_2021;
         default:
-            return MAX_PACKET_SIZE_F1_2018;
+            return 2000;
         }
+    }
+
+    private int numberOfCars() {
+        switch (version) {
+        case F1_2020:
+            return 22;
+        case F1_2021:
+            return 22;
+        default:
+            return 20;
+        }
+
     }
 
     private Packet buildPacket() {
@@ -117,6 +141,10 @@ public class PacketDeserializer {
             return buildPacketCarTelemetryData(header);
         case 7:
             return buildPacketCarStatusData(header);
+        case 10:
+            return buildPacketCarDamageData(header);
+        case 11:
+            return buildPacketSessionHistoryData(header);
         }
 
         return null;
@@ -131,15 +159,18 @@ public class PacketDeserializer {
      * {@code 
      	struct PacketHeader
     	{
-    		uint16    m_packetFormat;         // 2018
-    		uint8_t   m_gameMajorVersion;     // Game major version - "X.00"
-            uint8_t   m_gameMinorVersion;     // Game minor version - "1.XX"
-    		uint8     m_packetVersion;        // Version of this packet type, all start from 1
-    		uint8     m_packetId;             // Identifier for the packet type, see below
-    		uint64    m_sessionUID;           // Unique identifier for the session
-    		float     m_sessionTime;          // Session timestamp
-    		uint      m_frameIdentifier;      // Identifier for the frame the data was retrieved on
-    		uint8     m_playerCarIndex;       // Index of player's car in the array
+    		uint16    m_packetFormat;             // 2018
+    		uint8     m_gameMajorVersion;         // Game major version - "X.00"
+            uint8     m_gameMinorVersion;         // Game minor version - "1.XX"
+    		uint8     m_packetVersion;            // Version of this packet type, all start from 1
+    		uint8     m_packetId;                 // Identifier for the packet type, see below
+    		uint64    m_sessionUID;               // Unique identifier for the session
+    		float     m_sessionTime;              // Session timestamp
+    		uint32    m_frameIdentifier;          // Identifier for the frame the data was retrieved on
+    		uint8     m_playerCarIndex;           // Index of player's car in the array
+    		uint8     m_secondaryPlayerCarIndex;  // Index of secondary player's car in
+                                                  // the array (split-screen)
+                                                  // 255 if no second player
     	};
      * }
      * </pre>
@@ -151,9 +182,14 @@ public class PacketDeserializer {
         Header header = new Header();
 
         header.setPacketFormat(buffer.getNextUInt16AsInt()); // 2
-        if (version == F1_2019) {
-            header.setGameMajorVersion(buffer.getNextUInt8AsInt());
-            header.setGameMinorVersion(buffer.getNextUInt8AsInt());
+
+        if (version == -1 || version != header.getPacketFormat()) {
+            version = header.getPacketFormat();
+        }
+
+        if (version >= F1_2019) {
+            header.setGameMajorVersion(buffer.getNextUInt8AsInt()); // 1
+            header.setGameMinorVersion(buffer.getNextUInt8AsInt()); // 1
         }
         header.setPacketVersion(buffer.getNextUInt8AsInt()); // 1
         header.setPacketId(buffer.getNextUInt8AsInt()); // 1
@@ -161,7 +197,19 @@ public class PacketDeserializer {
         header.setSessionTime(buffer.getNextFloat());// 4
         header.setFrameIdentifier(buffer.getNextUIntAsLong());// 4
         header.setPlayerCarIndex(buffer.getNextUInt8AsInt()); // 1
+        if (version >= F1_2021) {
+            header.setSecondaryPlayerCarIndex(buffer.getNextUInt8AsInt()); // 1
+        }
+
         return header;
+    }
+
+    private float msToSeconds(int ms) {
+        return ms != 0 ? (float) ms / (float) 1000 : 0;
+    }
+
+    private float msToSeconds(long ms) {
+        return ms != 0 ? (float) ms / (float) 1000 : 0;
     }
 
     /**
@@ -186,15 +234,12 @@ public class PacketDeserializer {
      * @return the PacketLapData pojo
      */
     private PacketLapData buildPacketLapData(Header header) {
-
         PacketLapData packetData = new PacketLapData();
         List<LapData> lapDataList = new ArrayList<>();
 
-        int i = 0;
         int playersIndex = header.getPlayerCarIndex();
-        while (i < TOTAL_NBR_CARS) {
+        for (int i = 0; i < numberOfCars(); i++) {
             lapDataList.add(buildLapData(i, i == playersIndex));
-            i++;
         }
 
         packetData.setHeader(header);
@@ -209,55 +254,100 @@ public class PacketDeserializer {
      * {@code 
     	struct LapData
     	{
-    	    float       m_lastLapTime;           // Last lap time in seconds
-    	    float       m_currentLapTime;        // Current time around the lap in seconds
-    	    float       m_bestLapTime;           // Best lap time of the session in seconds
-    	    float       m_sector1Time;           // Sector 1 time in seconds
-    	    float       m_sector2Time;           // Sector 2 time in seconds
-    	    float       m_lapDistance;           // Distance vehicle is around current lap in metres – could
-    	                                         // be negative if line hasn’t been crossed yet
-    	    float       m_totalDistance;         // Total distance travelled in session in metres – could
-    	                                         // be negative if line hasn’t been crossed yet
-    	    float       m_safetyCarDelta;        // Delta in seconds for safety car
-    	    uint8       m_carPosition;           // Car race position
-    	    uint8       m_currentLapNum;         // Current lap number
-    	    uint8       m_pitStatus;             // 0 = none, 1 = pitting, 2 = in pit area
-    	    uint8       m_sector;                // 0 = sector1, 1 = sector2, 2 = sector3
-    	    uint8       m_currentLapInvalid;     // Current lap invalid - 0 = valid, 1 = invalid
-    	    uint8       m_penalties;             // Accumulated time penalties in seconds to be added
-    	    uint8       m_gridPosition;          // Grid position the vehicle started the race in
-    	    uint8       m_driverStatus;          // Status of driver - 0 = in garage, 1 = flying lap
-    	                                         // 2 = in lap, 3 = out lap, 4 = on track
-    	    uint8       m_resultStatus;          // Result status - 0 = invalid, 1 = inactive, 2 = active
-    	                                         // 3 = finished, 4 = disqualified, 5 = not classified
-    	                                         // 6 = retyred
+    	    // <= F1 2019
+    	    float       m_lastLapTime;                 // Last lap time in seconds
+    	    float       m_currentLapTime;              // Current time around the lap in seconds
+    	    float       m_bestLapTime;                 // Best lap time of the session in seconds
+    	    float       m_sector1Time;                 // Sector 1 time in seconds
+    	    float       m_sector2Time;                 // Sector 2 time in seconds
+    	    
+    	    // >= F1 2020 ?
+    	    uint32      m_lastLapTimeInMS;             // Last lap time in milliseconds
+            uint32      m_currentLapTimeInMS;          // Current time around the lap in milliseconds
+            uint16      m_sector1TimeInMS;             // Sector 1 time in milliseconds
+            uint16      m_sector2TimeInMS;             // Sector 2 time in milliseconds
+    	    
+    	    float       m_lapDistance;                 // Distance vehicle is around current lap in metres – could
+    	                                               // be negative if line hasn’t been crossed yet
+    	    float       m_totalDistance;               // Total distance travelled in session in metres – could
+    	                                               // be negative if line hasn’t been crossed yet
+    	    float       m_safetyCarDelta;              // Delta in seconds for safety car
+    	    uint8       m_carPosition;                 // Car race position
+    	    uint8       m_currentLapNum;               // Current lap number
+    	    uint8       m_pitStatus;                   // 0 = none, 1 = pitting, 2 = in pit area
+    	    
+    	    // >= F1 2020 ?
+    	    uint8       m_numPitStops;                 // Number of pit stops taken in this race
+    	    
+    	    uint8       m_sector;                      // 0 = sector1, 1 = sector2, 2 = sector3
+    	    uint8       m_currentLapInvalid;           // Current lap invalid - 0 = valid, 1 = invalid
+    	    uint8       m_penalties;                   // Accumulated time penalties in seconds to be added
+    	    
+    	    // >= F1 2020 ?
+    	    uint8       m_warnings;                    // Accumulated number of warnings issued
+            uint8       m_numUnservedDriveThroughPens; // Num drive through pens left to serve
+            uint8       m_numUnservedStopGoPens;       // Num stop go pens left to serve
+    	    
+    	    uint8       m_gridPosition;                // Grid position the vehicle started the race in
+    	    uint8       m_driverStatus;                // Status of driver - 0 = in garage, 1 = flying lap
+    	                                               // 2 = in lap, 3 = out lap, 4 = on track
+    	    uint8       m_resultStatus;                // Result status - 0 = invalid, 1 = inactive, 2 = active
+    	                                               // 3 = finished, 4 = disqualified, 5 = not classified
+    	                                               // 6 = retyred
+    	                   
+            // >= F1 2020 ?
+    	    uint8       m_pitLaneTimerActive;          // Pit lane timing, 0 = inactive, 1 = active
+            uint16      m_pitLaneTimeInLaneInMS;       // If active, the current time spent in the pit lane in ms
+            uint16      m_pitStopTimerInMS;            // Time of the actual pit stop in ms
+            uint8       m_pitStopShouldServePen;       // Whether the car should serve a penalty at this stop
     	};
      * }
      * </pre>
      */
     private LapData buildLapData(int carIndex, boolean playersCar) {
-
         LapData lapData = new LapData();
 
         lapData.setCarIndex(carIndex);
         lapData.setPlayersCar(playersCar);
-        lapData.setLastLapTime(buffer.getNextFloat());
-        lapData.setCurrentLapTime(buffer.getNextFloat());
-        lapData.setBestLapTime(buffer.getNextFloat());
-        lapData.setSector1Time(buffer.getNextFloat());
-        lapData.setSector2Time(buffer.getNextFloat());
+
+        if (version <= F1_2019) {
+            lapData.setLastLapTime(buffer.getNextFloat());
+            lapData.setCurrentLapTime(buffer.getNextFloat());
+            lapData.setBestLapTime(buffer.getNextFloat());
+            lapData.setSector1Time(buffer.getNextFloat());
+            lapData.setSector2Time(buffer.getNextFloat());
+        } else if (version >= F1_2020) {
+            lapData.setLastLapTime(msToSeconds(buffer.getNextUIntAsLong()));
+            lapData.setCurrentLapTime(msToSeconds(buffer.getNextUIntAsLong()));
+            lapData.setSector1Time(msToSeconds(buffer.getNextUInt16AsInt()));
+            lapData.setSector2Time(msToSeconds(buffer.getNextUInt16AsInt()));
+        }
         lapData.setLapDistance(buffer.getNextFloat());
         lapData.setTotalDistance(buffer.getNextFloat());
         lapData.setSafetyCarDelta(buffer.getNextFloat());
         lapData.setCarPosition(buffer.getNextUInt8AsInt());
         lapData.setCurrentLapNum(buffer.getNextUInt8AsInt());
         lapData.setPitStatus(PitStatus.fromInt(buffer.getNextUInt8AsInt()));
+        if (version >= F1_2020) {
+            lapData.setNumPitStops(buffer.getNextUInt8AsInt());
+        }
         lapData.setSector(buffer.getNextUInt8AsInt() + 1);
         lapData.setCurrentLapInvalid(buffer.getNextUInt8AsInt() == 1);
         lapData.setPenalties(buffer.getNextUInt8AsInt());
+        if (version >= F1_2020) {
+            lapData.setWarnings(buffer.getNextUInt8AsInt());
+            lapData.setNumUnservedDriveThroughPens(buffer.getNextUInt8AsInt());
+            lapData.setNumUnservedStopGoPens(buffer.getNextUInt8AsInt());
+        }
         lapData.setGridPosition(buffer.getNextUInt8AsInt());
         lapData.setDriverStatus(DriverStatus.fromInt(buffer.getNextUInt8AsInt()));
         lapData.setResultStatus(ResultStatus.fromInt(buffer.getNextUInt8AsInt()));
+        if (version >= F1_2020) {
+            lapData.setPitLaneTimerActive(buffer.getNextUInt8AsInt() == 1);
+            lapData.setPitLaneTimeInLane(msToSeconds(buffer.getNextUInt16AsInt()));
+            lapData.setPitStopTimer(msToSeconds(buffer.getNextUInt16AsInt()));
+            lapData.setPitStopShouldServePen(buffer.getNextUInt8AsInt());
+        }
 
         return lapData;
     }
@@ -279,7 +369,7 @@ public class PacketDeserializer {
     	{
     	    PacketHeader    m_header;               	// Header
     	
-    	    CarMotionData   m_carMotionData[20];		// Data for all cars on track
+    	    CarMotionData   m_carMotionData[2?];		// Data for all cars on track
     	
     	    // Extra player car ONLY data
     	    float         m_suspensionPosition[4];       // Note: All wheel arrays have the following order:
@@ -309,11 +399,10 @@ public class PacketDeserializer {
 
         packetMotionData.setHeader(header);
         List<CarMotionData> carMotionDataList = new ArrayList<>();
-        int carIndex = 0;
+
         int playersCarIndex = packetMotionData.getHeader().getPlayerCarIndex();
-        while (carIndex < TOTAL_NBR_CARS) {
+        for (int carIndex = 0; carIndex < numberOfCars(); carIndex++) {
             carMotionDataList.add(buildCarMotionData(carIndex, carIndex == playersCarIndex));
-            carIndex++;
         }
         packetMotionData.setCarMotionDataList(carMotionDataList);
         packetMotionData.setSuspensionPosition(new WheelData<Float>(buffer.getNextFloatArray(4)));
@@ -437,6 +526,27 @@ public class PacketDeserializer {
     	    uint8           m_safetyCarStatus;      // 0 = no safety car, 1 = full safety car
     	                                            // 2 = virtual safety car
     	    uint8          m_networkGame;           // 0 = offline, 1 = online
+    	    
+    	    // >= F1 2020 ?
+    	    uint8           m_numWeatherForecastSamples; // Number of weather samples to follow
+            WeatherForecastSample m_weatherForecastSamples[56];   // Array of weather forecast samples
+            uint8           m_forecastAccuracy;          // 0 = Perfect, 1 = Approximate
+            uint8           m_aiDifficulty;              // AI Difficulty rating – 0-110
+            uint32          m_seasonLinkIdentifier;      // Identifier for season - persists across saves
+            uint32          m_weekendLinkIdentifier;     // Identifier for weekend - persists across saves
+            uint32          m_sessionLinkIdentifier;     // Identifier for session - persists across saves
+            uint8           m_pitStopWindowIdealLap;     // Ideal lap to pit on for current strategy (player)
+            uint8           m_pitStopWindowLatestLap;    // Latest lap to pit on for current strategy (player)
+            uint8           m_pitStopRejoinPosition;     // Predicted position to rejoin at (player)
+            uint8           m_steeringAssist;            // 0 = off, 1 = on
+            uint8           m_brakingAssist;             // 0 = off, 1 = low, 2 = medium, 3 = high
+            uint8           m_gearboxAssist;             // 1 = manual, 2 = manual & suggested gear, 3 = auto
+            uint8           m_pitAssist;                 // 0 = off, 1 = on
+            uint8           m_pitReleaseAssist;          // 0 = off, 1 = on
+            uint8           m_ERSAssist;                 // 0 = off, 1 = on
+            uint8           m_DRSAssist;                 // 0 = off, 1 = on
+            uint8           m_dynamicRacingLine;         // 0 = off, 1 = corners only, 2 = full
+            uint8           m_dynamicRacingLineType;     // 0 = 2D, 1 = 3D
     	};
      * }
      * </pre>
@@ -461,9 +571,31 @@ public class PacketDeserializer {
         sessionData.setSpectating(buffer.getNextUInt8AsBoolean());
         sessionData.setSliProNativeSupport(buffer.getNextUInt8AsBoolean());
         sessionData.setNumMarshalZones(buffer.getNextInt8AsInt());
-        sessionData.setMarshalZones(buildMarshalZones());
+        sessionData.setMarshalZones(buildMarshalZones(sessionData.getNumMarshalZones()));
         sessionData.setSafetyCarStatus(SafetyCarStatus.fromInt(buffer.getNextUInt8AsInt()));
         sessionData.setNetworkGame(buffer.getNextUInt8AsBoolean());
+
+        if (version >= F1_2020) {
+            sessionData.setNumWeatherForecastSamples(buffer.getNextInt8AsInt());
+            sessionData.setWeatherForecast(buildWeatherForecasts(sessionData.getNumWeatherForecastSamples()));
+            sessionData.setForecastAccuracy(buffer.getNextUInt8AsInt());
+            sessionData.setAiDifficulty(buffer.getNextUInt8AsInt());
+            sessionData.setSeasonLinkIdentifier(buffer.getNextUIntAsLong());
+            sessionData.setWeekendLinkIdentifier(buffer.getNextUIntAsLong());
+            sessionData.setSessionLinkIdentifier(buffer.getNextUIntAsLong());
+            sessionData.setPitStopWindowIdealLap(buffer.getNextUInt8AsInt());
+            sessionData.setPitStopWindowLatestLap(buffer.getNextUInt8AsInt());
+            sessionData.setPitStopRejoinPosition(buffer.getNextUInt8AsInt());
+            sessionData.setSteeringAssist(buffer.getNextUInt8AsBoolean());
+            sessionData.setBrakingAssist(buffer.getNextUInt8AsBoolean());
+            sessionData.setGearboxAssist(buffer.getNextUInt8AsBoolean());
+            sessionData.setPitAssist(buffer.getNextUInt8AsBoolean());
+            sessionData.setPitReleaseAssist(buffer.getNextUInt8AsBoolean());
+            sessionData.setERSAssist(buffer.getNextUInt8AsBoolean());
+            sessionData.setDRSAssist(buffer.getNextUInt8AsBoolean());
+            sessionData.setDynamicRacingLine(buffer.getNextUInt8AsInt());
+            sessionData.setDynamicRacingLineType(buffer.getNextUInt8AsInt());
+        }
 
         return sessionData;
     }
@@ -481,15 +613,52 @@ public class PacketDeserializer {
      * }
      * </pre>
      */
-    private List<MarshalZone> buildMarshalZones() {
+    private List<MarshalZone> buildMarshalZones(int numZones) {
         List<MarshalZone> marshalZones = new ArrayList<>();
-        for (int k = 0; k < MAX_NBR_MARSHAL_ZONES; k++) {
+        for (int k = 0; k < numZones; k++) {
             MarshalZone marshalZone = new MarshalZone();
             marshalZone.setZoneStart(buffer.getNextFloat());
             marshalZone.setZoneFlag(ZoneFlag.fromInt(buffer.getNextInt8AsInt()));
             marshalZones.add(marshalZone);
         }
         return marshalZones;
+    }
+
+    /**
+     * <pre>
+     * {@code
+     *  struct WeatherForecastSample
+        {
+            uint8     m_sessionType;              // 0 = unknown, 1 = P1, 2 = P2, 3 = P3, 4 = Short P, 5 = Q1
+                                                  // 6 = Q2, 7 = Q3, 8 = Short Q, 9 = OSQ, 10 = R, 11 = R2
+                                                  // 12 = Time Trial
+            uint8     m_timeOffset;               // Time in minutes the forecast is for
+            uint8     m_weather;                  // Weather - 0 = clear, 1 = light cloud, 2 = overcast
+                                                  // 3 = light rain, 4 = heavy rain, 5 = storm
+            int8      m_trackTemperature;         // Track temp. in degrees Celsius
+            int8      m_trackTemperatureChange;   // Track temp. change – 0 = up, 1 = down, 2 = no change
+            int8      m_airTemperature;           // Air temp. in degrees celsius
+            int8      m_airTemperatureChange;     // Air temp. change – 0 = up, 1 = down, 2 = no change
+            uint8     m_rainPercentage;           // Rain percentage (0-100)
+        };
+     * }
+     * </pre>
+     */
+    private List<WeatherForecast> buildWeatherForecasts(int num) {
+        num = num == 255 ? 56 : Integer.max(num, 56);
+        List<WeatherForecast> weatherForecasts = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            WeatherForecast weatherForecast = new WeatherForecast();
+            weatherForecast.setSessionType(SessionType.fromInt(buffer.getNextUInt8AsInt()));
+            weatherForecast.setTimeOffset(buffer.getNextUInt8AsInt());
+            weatherForecast.setWeather(buffer.getNextUInt8AsInt());
+            weatherForecast.setTrackTemperature(buffer.getNextInt8AsInt());
+            weatherForecast.setTrackTemperatureChange(buffer.getNextInt8AsInt());
+            weatherForecast.setAirTemperature(buffer.getNextInt8AsInt());
+            weatherForecast.setAirTemperatureChange(buffer.getNextInt8AsInt());
+            weatherForecast.setRainPercentage(buffer.getNextUInt8AsInt());
+        }
+        return weatherForecasts;
     }
 
     /**
@@ -556,15 +725,18 @@ public class PacketDeserializer {
      * 
      */
     private PacketParticipantsData buildPacketParticipantsData(Header header) {
-
         PacketParticipantsData participantsData = new PacketParticipantsData();
+
         participantsData.setHeader(header);
         participantsData.setNumCars(buffer.getNextUInt8AsInt());
+
+        int numCars = participantsData.getNumCars() == 255 ? numberOfCars() : participantsData.getNumCars();
         List<ParticipantData> participants = new ArrayList<>();
-        for (int k = 0; k < participantsData.getNumCars(); k++) {
+        for (int k = 0; k < numCars; k++) {
             participants.add(buildParticipantData());
         }
         participantsData.setParticipants(participants);
+
         // Ignore the rest of the data in the buffer
         return participantsData;
     }
@@ -578,7 +750,9 @@ public class PacketDeserializer {
     	{
     	    uint8      m_aiControlled;           // Whether the vehicle is AI (1) or Human (0) controlled
     	    uint8      m_driverId;               // Driver id - see appendix
+    	    uint8      m_networkId;              // Network id – unique identifier for network players, >= 2020
     	    uint8      m_teamId;                 // Team id - see appendix
+    	    uint8      m_myTeam;                 // My team flag – 1 = My Team, 0 = otherwise, >= 2020
     	    uint8      m_raceNumber;             // Race number of the car
     	    uint8      m_nationality;            // Nationality of the driver
     	    char       m_name[48];               // Name of participant in UTF-8 format – null terminated
@@ -590,16 +764,23 @@ public class PacketDeserializer {
      */
     private ParticipantData buildParticipantData() {
         ParticipantData participant = new ParticipantData();
+
         participant.setAiControlled(buffer.getNextUInt8AsBoolean());
         participant.setDriverId(buffer.getNextUInt8AsInt());
+        if (version >= F1_2019) {
+            participant.setNetworkId(buffer.getNextUInt8AsInt());
+        }
         participant.setTeamId(buffer.getNextUInt8AsInt());
+        if (version >= F1_2019) {
+            participant.setMyTeam(buffer.getNextUInt8AsInt());
+        }
         participant.setRaceNumber(buffer.getNextUInt8AsInt());
         participant.setNationality(buffer.getNextUInt8AsInt());
         participant.setName(buffer.getNextCharArrayAsString(48));
-
-        if (version == F1_2019) {
+        if (version >= F1_2019) {
             participant.setYourTelemetry(buffer.getNextUInt8AsBoolean());
         }
+
         return participant;
     }
 
@@ -632,7 +813,7 @@ public class PacketDeserializer {
         PacketCarSetupData carSetupData = new PacketCarSetupData();
         carSetupData.setHeader(header);
         List<CarSetupData> carSetups = new ArrayList<>();
-        for (int k = 0; k < TOTAL_NBR_CARS; k++) {
+        for (int k = 0; k < numberOfCars(); k++) {
             carSetups.add(buildCarSetupData());
         }
         carSetupData.setCarSetups(carSetups);
@@ -662,8 +843,17 @@ public class PacketDeserializer {
     		uint8     m_rearSuspensionHeight;     // Rear ride height
     		uint8     m_brakePressure;            // Brake pressure (percentage)
     		uint8     m_brakeBias;                // Brake bias (percentage)
+    		
+    		// >= F1 2019
     		float     m_frontTyrePressure;        // Front tyre pressure (PSI)
     		float     m_rearTyrePressure;         // Rear tyre pressure (PSI)
+    		
+    		// >= F1 2020 ?
+    		float     m_rearLeftTyrePressure;     // Rear left tyre pressure (PSI)
+            float     m_rearRightTyrePressure;    // Rear right tyre pressure (PSI)
+            float     m_frontLeftTyrePressure;    // Front left tyre pressure (PSI)
+            float     m_frontRightTyrePressure;   // Front right tyre pressure (PSI)
+    		
     		uint8     m_ballast;                  // Ballast
     		float     m_fuelLoad;                 // Fuel load
     	};
@@ -690,8 +880,15 @@ public class PacketDeserializer {
         setupData.setRearSuspensionHeight(buffer.getNextUInt8AsInt()); // 38*
         setupData.setBrakePressure(buffer.getNextUInt8AsInt());
         setupData.setBrakeBias(buffer.getNextUInt8AsInt()); // 39
-        setupData.setFrontTyrePressure(buffer.getNextFloat()); // 47
-        setupData.setRearTyrePressure(buffer.getNextFloat()); // 55
+        if (version <= F1_2019) {
+            setupData.setFrontTyrePressure(buffer.getNextFloat()); // 47
+            setupData.setRearTyrePressure(buffer.getNextFloat()); // 55
+        } else if (version > F1_2019) {
+            setupData.setRearLeftTyrePressure(buffer.getNextFloat());
+            setupData.setRearRightTyrePressure(buffer.getNextFloat());
+            setupData.setFrontLeftTyrePressure(buffer.getNextFloat());
+            setupData.setFrontRightTyrePressure(buffer.getNextFloat());
+        }
         setupData.setBallast(buffer.getNextUInt8AsInt()); // 56
         setupData.setFuelLoad(buffer.getNextFloat()); // 40
         return setupData;
@@ -716,8 +913,18 @@ public class PacketDeserializer {
     	
     	    CarTelemetryData    m_carTelemetryData[20];
     	
+    	    // F1 2019
     	    uint32              m_buttonStatus;         // Bit flags specifying which buttons are being
     	                                                // pressed currently - see appendices
+    
+            // F1 2021
+            uint8               m_mfdPanelIndex;       // Index of MFD panel open - 255 = MFD closed
+                                                       // Single player, race – 0 = Car setup, 1 = Pits
+                                                       // 2 = Damage, 3 =  Engine, 4 = Temperatures
+                                                       // May vary depending on game mode
+            uint8               m_mfdPanelIndexSecondaryPlayer;   // See above
+            int8                m_suggestedGear;       // Suggested gear for the player (1-8)
+                                                       // 0 if no gear suggested
     	};
      * }
      * </pre>
@@ -727,12 +934,20 @@ public class PacketDeserializer {
      */
     private PacketCarTelemetryData buildPacketCarTelemetryData(Header header) {
         PacketCarTelemetryData packetCarTelemetry = new PacketCarTelemetryData();
+
         packetCarTelemetry.setHeader(header);
         List<CarTelemetryData> carsTelemetry = new ArrayList<>();
-        for (int k = 0; k < TOTAL_NBR_CARS; k++) {
+        for (int k = 0; k < numberOfCars(); k++) {
             carsTelemetry.add(buildCarTelemetryData());
         }
-        packetCarTelemetry.setButtonStatus(buildButtonStatus());
+        if (version <= F1_2019) {
+            packetCarTelemetry.setButtonStatus(buildButtonStatus());
+        }
+        if (version > F1_2019) {
+            packetCarTelemetry.setMfdPanelIndex(buffer.getNextUInt8AsInt());
+            packetCarTelemetry.setMfdPanelIndexSecondaryPlayer(buffer.getNextUInt8AsInt());
+            packetCarTelemetry.setSuggestedGear(buffer.getNextInt8AsInt());
+        }
         packetCarTelemetry.setCarTelemetryData(carsTelemetry);
         return packetCarTelemetry;
     }
@@ -753,6 +968,7 @@ public class PacketDeserializer {
     	    uint16    m_engineRPM;                  // Engine RPM
     	    uint8     m_drs;                        // 0 = off, 1 = on
     	    uint8     m_revLightsPercent;           // Rev lights indicator (percentage)
+    	    uint16    m_revLightsBitValue;          // Rev lights (bit 0 = leftmost LED, bit 14 = rightmost LED) > F1 2019
     	    uint16    m_brakesTemperature[4];       // Brakes temperature (celsius)
     	    uint16    m_tyresSurfaceTemperature[4]; // Tyres surface temperature (celsius)
     	    uint16    m_tyresInnerTemperature[4];   // Tyres inner temperature (celsius)
@@ -774,7 +990,7 @@ public class PacketDeserializer {
             carTelemetry.setThrottle(buffer.getNextUInt8AsInt());
             carTelemetry.setSteer(buffer.getNextInt8AsInt());
             carTelemetry.setBrake(buffer.getNextUInt8AsInt());
-        } else if (version == F1_2019) {
+        } else if (version >= F1_2019) {
             carTelemetry.setThrottle(Math.round(buffer.getNextFloat() * 100));
             carTelemetry.setSteer(Math.round(buffer.getNextFloat() * 100));
             carTelemetry.setBrake(Math.round(buffer.getNextFloat() * 100));
@@ -784,13 +1000,20 @@ public class PacketDeserializer {
         carTelemetry.setEngineRpm(buffer.getNextUInt16AsInt());
         carTelemetry.setDrs(buffer.getNextUInt8AsBoolean());
         carTelemetry.setRevLightsPercent(buffer.getNextUInt8AsInt());
+        if (version >= F1_2021) {
+            carTelemetry.setRevLightsBitValue(buffer.getNextUInt16AsInt());
+        }
         carTelemetry.setBrakeTemperature(new WheelData<Integer>(buffer.getNextUInt16ArrayAsIntegerArray(4)));
-        carTelemetry.setTyreSurfaceTemperature(new WheelData<Integer>(buffer.getNextUInt16ArrayAsIntegerArray(4)));
-        carTelemetry.setTyreInnerTemperature(new WheelData<Integer>(buffer.getNextUInt16ArrayAsIntegerArray(4)));
+        if (version <= F1_2019) {
+            carTelemetry.setTyreSurfaceTemperature(new WheelData<Integer>(buffer.getNextUInt16ArrayAsIntegerArray(4)));
+            carTelemetry.setTyreInnerTemperature(new WheelData<Integer>(buffer.getNextUInt16ArrayAsIntegerArray(4)));
+        } else if (version >= F1_2021) {
+            carTelemetry.setTyreSurfaceTemperature(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
+            carTelemetry.setTyreInnerTemperature(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
+        }
         carTelemetry.setEngineTemperature(buffer.getNextUInt16AsInt());
         carTelemetry.setTyrePressure(new WheelData<Float>(buffer.getNextFloatArray(4)));
-
-        if (version == F1_2019) {
+        if (version >= F1_2019) {
             carTelemetry.setSurfaceType(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
         }
 
@@ -860,7 +1083,7 @@ public class PacketDeserializer {
 
         packetCarStatus.setHeader(header);
         List<CarStatusData> carStatuses = new ArrayList<>();
-        for (int k = 0; k < TOTAL_NBR_CARS; k++) {
+        for (int k = 0; k < numberOfCars(); k++) {
             carStatuses.add(buildCarStatusData());
         }
         packetCarStatus.setCarStatuses(carStatuses);
@@ -887,7 +1110,14 @@ public class PacketDeserializer {
     	    uint16      m_idleRPM;                  // Cars idle RPM
     	    uint8       m_maxGears;                 // Maximum number of gears
     	    uint8       m_drsAllowed;               // 0 = not allowed, 1 = allowed, -1 = unknown
+    	    
+    	    // >= F1 2020
+            uint16      m_drsActivationDistance;    // 0 = DRS not available, non-zero - DRS will be available
+                                                    // in [X] metres
+    
+            // <= F1 2019
     	    uint8       m_tyresWear[4];             // Tyre wear percentage
+    	    
     	    uint8       m_tyreCompound;             // Modern - 0 = hyper soft, 1 = ultra soft
     	                                            // 2 = super soft, 3 = soft, 4 = medium, 5 = hard
     	                                            // 6 = super hard, 7 = inter, 8 = wet
@@ -896,6 +1126,9 @@ public class PacketDeserializer {
                                                     // 16 = soft, 17 = medium, 18 = hard, 7 = inter, 8 = wet
                                                     // F1 Classic – same as above
                                                     // F2 – same as above
+                                                     
+                                                    
+            // <= F1 2019
     	    uint8       m_tyresDamage[4];           // Tyre damage (percentage)
     	    uint8       m_frontLeftWingDamage;      // Front left wing damage (percentage)
     	    uint8       m_frontRightWingDamage;     // Front right wing damage (percentage)
@@ -903,6 +1136,10 @@ public class PacketDeserializer {
     	    uint8       m_engineDamage;             // Engine damage (percentage)
     	    uint8       m_gearBoxDamage;            // Gear box damage (percentage)
     	    uint8       m_exhaustDamage;            // Exhaust damage (percentage)
+    	    
+    	    // >= F1 2020
+    	    uint8       m_tyresAgeLaps;             // Age in laps of the current set of tyres
+    	    
     	    int8        m_vehicleFiaFlags;          // -1 = invalid/unknown, 0 = none, 1 = green
     	                                            // 2 = blue, 3 = yellow, 4 = red
     	    float       m_ersStoreEnergy;           // ERS energy store in Joules
@@ -911,6 +1148,9 @@ public class PacketDeserializer {
     	    float       m_ersHarvestedThisLapMGUK;  // ERS energy harvested this lap by MGU-K
     	    float       m_ersHarvestedThisLapMGUH;  // ERS energy harvested this lap by MGU-H
     	    float       m_ersDeployedThisLap;       // ERS energy deployed this lap
+    	    
+    	    // >= F1 2020
+    	    uint8       m_networkPaused;            // Whether the car is paused in a network game
     	};
      * }
      * </pre>
@@ -928,27 +1168,35 @@ public class PacketDeserializer {
         carStatus.setPitLimiterOn(buffer.getNextUInt8AsBoolean());
         carStatus.setFuelInTank(buffer.getNextFloat());
         carStatus.setFuelCapacity(buffer.getNextFloat());
-        if (version == F1_2019) {
+        if (version >= F1_2019) {
             carStatus.setFuelRemainingLaps(buffer.getNextFloat());
         }
         carStatus.setMaxRpm(buffer.getNextUInt16AsInt());
         carStatus.setIdleRpm(buffer.getNextUInt16AsInt());
         carStatus.setMaxGears(buffer.getNextUInt8AsInt());
         carStatus.setDrsAllowed(buffer.getNextUInt8AsInt());
-        carStatus.setTyresWear(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
+        if (version >= F1_2020) {
+            carStatus.setDrsActivationDistance(buffer.getNextUInt16AsInt());
+        }
+        if (version <= F1_2019) {
+            carStatus.setTyresWear(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
+        }
         carStatus.setTyreCompound(buffer.getNextUInt8AsInt());
-        if (version == F1_2019) {
+        if (version >= F1_2019) {
             carStatus.setTyreVisualCompound(buffer.getNextUInt8AsInt());
         }
-        carStatus.setTyresDamage(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
-        carStatus.setFrontLeftWingDamage(buffer.getNextUInt8AsInt());
-        carStatus.setFrontRightWingDamage(buffer.getNextUInt8AsInt());
-        carStatus.setRearWingDamage(buffer.getNextUInt8AsInt());
-        carStatus.setEngineDamage(buffer.getNextUInt8AsInt());
-        carStatus.setGearBoxDamage(buffer.getNextUInt8AsInt());
-        if (version == F1_2018) {
-            carStatus.setExhaustDamage(buffer.getNextUInt8AsInt());
+        if (version <= F1_2019) {
+            carStatus.setTyresDamage(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
+            carStatus.setFrontLeftWingDamage(buffer.getNextUInt8AsInt());
+            carStatus.setFrontRightWingDamage(buffer.getNextUInt8AsInt());
+            carStatus.setRearWingDamage(buffer.getNextUInt8AsInt());
+            carStatus.setEngineDamage(buffer.getNextUInt8AsInt());
+            carStatus.setGearBoxDamage(buffer.getNextUInt8AsInt());
+            if (version == F1_2018) {
+                carStatus.setExhaustDamage(buffer.getNextUInt8AsInt());
+            }
         }
+        carStatus.setTyresAgeLaps(buffer.getNextUInt8AsInt());
         carStatus.setVehicleFiaFlags(buffer.getNextInt8AsInt());
         carStatus.setErsStoreEngery(buffer.getNextFloat());
         carStatus.setErsDeployMode(buffer.getNextUInt8AsInt());
@@ -956,6 +1204,199 @@ public class PacketDeserializer {
         carStatus.setErsHarvestedThisLapMGUH(buffer.getNextFloat());
         carStatus.setErsDeployedThisLap(buffer.getNextFloat());
 
+        if (version >= F1_2020) {
+            carStatus.setNetworkPaused(buffer.getNextUInt8AsInt());
+        }
+
         return carStatus;
     }
+
+    /**
+     * 
+     * <pre>
+     * {@code
+     *  struct PacketCarDamageData
+        {
+            PacketHeader    m_header;               // Header
+    
+            CarDamageData   m_carDamageData[22];
+        };
+     * }
+     * </pre>
+     * @param header
+     * @return
+     */
+    private PacketCarDamageData buildPacketCarDamageData(Header header) {
+        PacketCarDamageData packetCarStatus = new PacketCarDamageData();
+
+        packetCarStatus.setHeader(header);
+        List<CarDamageData> carDamages = new ArrayList<>();
+        for (int k = 0; k < numberOfCars(); k++) {
+            carDamages.add(buildCarDamageData());
+        }
+        packetCarStatus.setCarDamages(carDamages);
+
+        return packetCarStatus;
+    }
+
+    /**
+     * 
+     * <pre>
+     * {@code
+     *   struct CarDamageData
+         {
+            float     m_tyresWear[4];                     // Tyre wear (percentage)
+            uint8     m_tyresDamage[4];                   // Tyre damage (percentage)
+            uint8     m_brakesDamage[4];                  // Brakes damage (percentage)
+            uint8     m_frontLeftWingDamage;              // Front left wing damage (percentage)
+            uint8     m_frontRightWingDamage;             // Front right wing damage (percentage)
+            uint8     m_rearWingDamage;                   // Rear wing damage (percentage)
+            uint8     m_floorDamage;                      // Floor damage (percentage)
+            uint8     m_diffuserDamage;                   // Diffuser damage (percentage)
+            uint8     m_sidepodDamage;                    // Sidepod damage (percentage)
+            uint8     m_drsFault;                         // Indicator for DRS fault, 0 = OK, 1 = fault
+            uint8     m_gearBoxDamage;                    // Gear box damage (percentage)
+            uint8     m_engineDamage;                     // Engine damage (percentage)
+            uint8     m_engineMGUHWear;                   // Engine wear MGU-H (percentage)
+            uint8     m_engineESWear;                     // Engine wear ES (percentage)
+            uint8     m_engineCEWear;                     // Engine wear CE (percentage)
+            uint8     m_engineICEWear;                    // Engine wear ICE (percentage)
+            uint8     m_engineMGUKWear;                   // Engine wear MGU-K (percentage)
+            uint8     m_engineTCWear;                     // Engine wear TC (percentage)
+        }
+     * }
+     */
+    private CarDamageData buildCarDamageData() {
+        CarDamageData carDamage = new CarDamageData();
+
+        carDamage.setTyresWear(new WheelData<Float>(buffer.getNextFloatArray(4)));
+        carDamage.setTyresDamage(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
+        carDamage.setBrakesDamage(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
+        carDamage.setFrontLeftWingDamage(buffer.getNextInt8AsInt());
+        carDamage.setFrontRightWingDamage(buffer.getNextInt8AsInt());
+        carDamage.setRearWingDamage(buffer.getNextInt8AsInt());
+        carDamage.setFloorDamage(buffer.getNextInt8AsInt());
+        carDamage.setDiffuserDamage(buffer.getNextInt8AsInt());
+        carDamage.setSidepodDamage(buffer.getNextInt8AsInt());
+        carDamage.setDrsFault(buffer.getNextInt8AsInt());
+        carDamage.setGearBoxDamage(buffer.getNextInt8AsInt());
+        carDamage.setEngineDamage(buffer.getNextInt8AsInt());
+        carDamage.setEngineMGUHWear(buffer.getNextInt8AsInt());
+        carDamage.setEngineESWear(buffer.getNextInt8AsInt());
+        carDamage.setEngineCEWear(buffer.getNextInt8AsInt());
+        carDamage.setEngineICEWear(buffer.getNextInt8AsInt());
+        carDamage.setEngineMGUKWear(buffer.getNextInt8AsInt());
+        carDamage.setEngineTCWear(buffer.getNextInt8AsInt());
+
+        return carDamage;
+    }
+
+    /**
+     * 
+     * <pre>
+     * {@code
+     *  struct PacketSessionHistoryData
+        {
+            PacketHeader  m_header;                   // Header
+    
+            uint8         m_carIdx;                   // Index of the car this lap data relates to
+            uint8         m_numLaps;                  // Num laps in the data (including current partial lap)
+            uint8         m_numTyreStints;            // Number of tyre stints in the data
+    
+            uint8         m_bestLapTimeLapNum;        // Lap the best lap time was achieved on
+            uint8         m_bestSector1LapNum;        // Lap the best Sector 1 time was achieved on
+            uint8         m_bestSector2LapNum;        // Lap the best Sector 2 time was achieved on
+            uint8         m_bestSector3LapNum;        // Lap the best Sector 3 time was achieved on
+    
+            LapHistoryData          m_lapHistoryData[100];  // 100 laps of data max
+            TyreStintHistoryData    m_tyreStintsHistoryData[8];
+        };
+     * }
+     * </pre>
+     * 
+     * @param header
+     * @return
+     */
+    private PacketSessionHistoryData buildPacketSessionHistoryData(Header header) {
+        PacketSessionHistoryData packetSessionHistory = new PacketSessionHistoryData();
+
+        packetSessionHistory.setHeader(header);
+        packetSessionHistory.setCarIdx(buffer.getNextUInt8AsInt());
+        packetSessionHistory.setNumLaps(buffer.getNextUInt8AsInt());
+        packetSessionHistory.setNumTyreStints(buffer.getNextUInt8AsInt());
+        packetSessionHistory.setBestLapTimeLapNum(buffer.getNextUInt8AsInt());
+        packetSessionHistory.setBestSector1LapNum(buffer.getNextUInt8AsInt());
+        packetSessionHistory.setBestSector2LapNum(buffer.getNextUInt8AsInt());
+        packetSessionHistory.setBestSector3LapNum(buffer.getNextUInt8AsInt());
+
+        int numLaps = packetSessionHistory.getNumLaps() == 0 ? 100 : packetSessionHistory.getNumLaps();
+        List<LapHistoryData> lapHistoryData = new ArrayList<>();
+        for (int i = 0; i < numLaps; i++) {
+            lapHistoryData.add(buildLapHistoryData());
+        }
+        packetSessionHistory.setLapHistoryData(lapHistoryData);
+
+        int numStints = packetSessionHistory.getNumTyreStints() == 0 ? 8 : packetSessionHistory.getNumTyreStints();
+        List<TyreStintHistoryData> tyreStintHistoryData = new ArrayList<>();
+        for (int i = 0; i < numStints; i++) {
+            tyreStintHistoryData.add(buildTyreStintsHistoryData());
+        }
+        packetSessionHistory.setTyreStintsHistoryData(tyreStintHistoryData);
+
+        return packetSessionHistory;
+    }
+
+    /**
+     * 
+     * <pre>
+     * {@code
+     *  struct LapHistoryData
+        {
+            uint32    m_lapTimeInMS;           // Lap time in milliseconds
+            uint16    m_sector1TimeInMS;       // Sector 1 time in milliseconds
+            uint16    m_sector2TimeInMS;       // Sector 2 time in milliseconds
+            uint16    m_sector3TimeInMS;       // Sector 3 time in milliseconds
+            uint8     m_lapValidBitFlags;      // 0x01 bit set-lap valid,      0x02 bit set-sector 1 valid
+                                               // 0x04 bit set-sector 2 valid, 0x08 bit set-sector 3 valid
+        };
+     * }
+     * </pre>
+     * @return
+     */
+    private LapHistoryData buildLapHistoryData() {
+        LapHistoryData lapHistory = new LapHistoryData();
+
+        lapHistory.setLapTime(msToSeconds(buffer.getNextUIntAsLong()));
+        lapHistory.setSector1Time(msToSeconds(buffer.getNextUInt16AsInt()));
+        lapHistory.setSector2Time(msToSeconds(buffer.getNextUInt16AsInt()));
+        lapHistory.setSector3Time(msToSeconds(buffer.getNextUInt16AsInt()));
+        lapHistory.setLapValidBitFlags(buffer.getNextUInt8AsInt());
+
+        return lapHistory;
+    }
+
+    /**
+     * 
+     * <pre>
+     * {@code
+     *  struct TyreStintHistoryData
+        {
+            uint8     m_endLap;                // Lap the tyre usage ends on (255 of current tyre)
+            uint8     m_tyreActualCompound;    // Actual tyres used by this driver
+            uint8     m_tyreVisualCompound;    // Visual tyres used by this driver
+        };
+     * }
+     * </pre>
+     * @return
+     */
+    private TyreStintHistoryData buildTyreStintsHistoryData() {
+        TyreStintHistoryData tyreStintHistory = new TyreStintHistoryData();
+
+        tyreStintHistory.setEndLap(buffer.getNextUInt8AsInt());
+        tyreStintHistory.setTyreActualCompound(buffer.getNextUInt8AsInt());
+        tyreStintHistory.setTyreVisualCompound(buffer.getNextUInt8AsInt());
+
+        return tyreStintHistory;
+    }
+
 }

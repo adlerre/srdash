@@ -103,7 +103,7 @@ public class Application {
 
         AutoExecutableHandler.startup();
 
-        tdSvc = new TelemetryDataService(Optional.ofNullable(telemetryVersion).orElse(PacketDeserializer.F1_2019));
+        tdSvc = new TelemetryDataService(Optional.ofNullable(telemetryVersion).orElse(PacketDeserializer.F1_AUTO));
         tdSvc.start();
 
         embeddedHttpServer = new EmbeddedHttpServer(host, port);

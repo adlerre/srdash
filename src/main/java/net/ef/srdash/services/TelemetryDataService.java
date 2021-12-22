@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 
 import net.ef.srdash.common.events.Event;
 import net.ef.srdash.common.events.EventManager;
+import net.ef.srdash.common.utils.DebugUtils;
 import net.ef.srdash.telemetry.data.Packet;
 import net.ef.srdash.telemetry.utils.PacketDeserializer;
 
@@ -49,7 +50,7 @@ public class TelemetryDataService {
     private ExecutorService executor;
 
     public TelemetryDataService() {
-        this(PacketDeserializer.F1_2018);
+        this(PacketDeserializer.F1_AUTO);
     }
 
     public TelemetryDataService(int version) {
@@ -108,7 +109,7 @@ public class TelemetryDataService {
             try (DatagramChannel channel = DatagramChannel.open()) {
                 channel.socket().bind(new InetSocketAddress(bindAddress, port));
                 LOGGER.info("Listening on " + bindAddress + ":" + port + "...");
-                ByteBuffer buf = ByteBuffer.allocate(PacketDeserializer.maxPacketSize(version));
+                ByteBuffer buf = ByteBuffer.allocate(PacketDeserializer.maxPacketSize(-1));
                 buf.order(ByteOrder.LITTLE_ENDIAN);
                 while (true) {
                     channel.receive(buf);

@@ -26,6 +26,8 @@ public class CarStatusData {
 
     private int drsAllowed;
 
+    private int drsActivationDistance;
+
     private WheelData<Integer> tyresWear;
 
     private int tyreCompound;
@@ -46,6 +48,8 @@ public class CarStatusData {
 
     private int exhaustDamage;
 
+    private int tyresAgeLaps;
+
     private int vehicleFiaFlags;
 
     private float ersStoreEngery;
@@ -57,6 +61,8 @@ public class CarStatusData {
     private float ersHarvestedThisLapMGUH;
 
     private float ersDeployedThisLap;
+
+    private int networkPaused;
 
     public CarStatusData() {
     }
@@ -165,6 +171,22 @@ public class CarStatusData {
         this.drsAllowed = drsAllowed;
     }
 
+    /**
+     * @return the drsActivationDistance
+     * @since 2020
+     */
+    public int getDrsActivationDistance() {
+        return drsActivationDistance;
+    }
+
+    /**
+     * @param drsActivationDistance the drsActivationDistance to set
+     * @since 2020
+     */
+    public void setDrsActivationDistance(int drsActivationDistance) {
+        this.drsActivationDistance = drsActivationDistance;
+    }
+
     public WheelData<Integer> getTyresWear() {
         return tyresWear;
     }
@@ -253,6 +275,22 @@ public class CarStatusData {
         this.exhaustDamage = exhaustDamage;
     }
 
+    /**
+     * @return the tyresAgeLaps
+     * @since 2021
+     */
+    public int getTyresAgeLaps() {
+        return tyresAgeLaps;
+    }
+
+    /**
+     * @param tyresAgeLaps the tyresAgeLaps to set
+     * @since 2021
+     */
+    public void setTyresAgeLaps(int tyresAgeLaps) {
+        this.tyresAgeLaps = tyresAgeLaps;
+    }
+
     public int getVehicleFiaFlags() {
         return vehicleFiaFlags;
     }
@@ -299,6 +337,20 @@ public class CarStatusData {
 
     public void setErsDeployedThisLap(float ersDeployedThisLap) {
         this.ersDeployedThisLap = ersDeployedThisLap;
+    }
+
+    /**
+     * @return the networkPaused
+     */
+    public int getNetworkPaused() {
+        return networkPaused;
+    }
+
+    /**
+     * @param networkPaused the networkPaused to set
+     */
+    public void setNetworkPaused(int networkPaused) {
+        this.networkPaused = networkPaused;
     }
 
 }

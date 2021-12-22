@@ -13,6 +13,7 @@ export interface Packet {
     carTelemetryData?: Array<CarTelemetryData>;
     carStatuses?: Array<CarStatusData>;
     lapDataList?: Array<LapData>;
+    carDamages?: Array<CarDamageData>;
 }
 
 export interface WheelData<T> {
@@ -52,6 +53,7 @@ export interface CarStatusData {
     idleRpm?: number;
     maxGears?: number;
     drsAllowed?: number;
+    drsActivationDistance?: number;
     tyresWear?: WheelData<number>;
     tyreCompound?: number;
     tyreVisualCompound?: number;
@@ -68,6 +70,27 @@ export interface CarStatusData {
     ersHarvestedThisLapMGUK?: number;
     ersHarvestedThisLapMGUH?: number;
     ersDeployedThisLap?: number;
+}
+
+export interface CarDamageData {
+    tyresWear?: WheelData<number>;
+    tyresDamage?: WheelData<number>;
+    brakesDamage?: WheelData<number>;
+    frontLeftWingDamage?: number;
+    frontRightWingDamage?: number;
+    rearWingDamage?: number;
+    floorDamage?: number;
+    diffuserDamage?: number;
+    sidepodDamage?: number;
+    drsFault?: number;
+    gearBoxDamage?: number;
+    engineDamage?: number;
+    engineMGUHWear?: number;
+    engineESWear?: number;
+    engineCEWear?: number;
+    engineICEWear?: number;
+    engineMGUKWear?: number;
+    engineTCWear?: number;
 }
 
 export enum PitStatus {
@@ -186,4 +209,30 @@ export interface SessionData extends Packet {
     marshalZones?: Array<MarshalZone>;
     safetyCarStatus?: SafetyCarStatus;
     networkGame?: boolean;
+}
+
+export interface LapHistoryData {
+    lapTime?: number;
+    sector1Time?: number;
+    sector2Time?: number;
+    sector3Time?: number;
+    lapValidBitFlags?: number;
+}
+
+export interface TyreStintHistoryData {
+    endLap?: number;
+    tyreActualCompound?: number;
+    tyreVisualCompound?: number;
+}
+
+export interface PacketSessionHistoryData extends Packet {
+    carIdx?: number;
+    numLaps?: number;
+    numTyreStints?: number;
+    bestLapTimeLapNum?: number;
+    bestSector1LapNum?: number;
+    bestSector2LapNum?: number;
+    bestSector3LapNum?: number;
+    lapHistoryData?: Array<LapHistoryData>;
+    tyreStintHistoryData?: Array<TyreStintHistoryData>;
 }

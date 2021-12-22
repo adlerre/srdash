@@ -20,6 +20,8 @@ public class CarTelemetryData {
 
     private int revLightsPercent;
 
+    private int revLightsBitValue;
+
     private WheelData<Integer> brakeTemperature;
 
     private WheelData<Integer> tyreSurfaceTemperature;
@@ -105,6 +107,22 @@ public class CarTelemetryData {
 
     public void setRevLightsPercent(int revLightsPercent) {
         this.revLightsPercent = revLightsPercent;
+    }
+
+    /**
+     * @return the revLightsBitValue
+     * @since 2021
+     */
+    public int getRevLightsBitValue() {
+        return revLightsBitValue;
+    }
+
+    /**
+     * @param revLightsBitValue the revLightsBitValue to set
+     * @since 2021
+     */
+    public void setRevLightsBitValue(int revLightsBitValue) {
+        this.revLightsBitValue = revLightsBitValue;
     }
 
     public WheelData<Integer> getBrakeTemperature() {

@@ -6,7 +6,11 @@ public class ParticipantData {
 
     private int driverId;
 
+    private int networkId;
+
     private int teamId;
+
+    private int myTeam;
 
     private int raceNumber;
 
@@ -35,12 +39,44 @@ public class ParticipantData {
         this.driverId = driverId;
     }
 
+    /**
+     * @return the networkId
+     * @since 2020
+     */
+    public int getNetworkId() {
+        return networkId;
+    }
+
+    /**
+     * @param networkId the networkId to set
+     * @since 2020
+     */
+    public void setNetworkId(int networkId) {
+        this.networkId = networkId;
+    }
+
     public int getTeamId() {
         return teamId;
     }
 
     public void setTeamId(int teamId) {
         this.teamId = teamId;
+    }
+
+    /**
+     * @return the myTeam
+     * @since 2020
+     */
+    public int getMyTeam() {
+        return myTeam;
+    }
+
+    /**
+     * @param myTeam the myTeam to set
+     * @since 2020
+     */
+    public void setMyTeam(int myTeam) {
+        this.myTeam = myTeam;
     }
 
     public int getRaceNumber() {
@@ -82,7 +118,5 @@ public class ParticipantData {
     public void setYourTelemetry(boolean yourTelemetry) {
         this.yourTelemetry = yourTelemetry;
     }
-    
-    
 
 }

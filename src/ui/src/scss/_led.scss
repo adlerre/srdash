@@ -47,17 +47,17 @@ $ledColors: (
 );
 
 @function ledSizeRatio($size) {
-    @return $ledCalcSize / $size;
+    @return calc($ledCalcSize / $size);
 }
 
 @function ledDarkShadow($size) {
     $ratio: ledSizeRatio($size);
-    @return rgba(0, 0, 0, 0.2) 0 (-1px / $ratio) (7px / $ratio) (1px / $ratio);
+    @return rgba(0, 0, 0, 0.2) 0 calc(-1px / $ratio) calc(7px / $ratio) calc(1px / $ratio);
 }
 
 @function ledInnerShadow($size, $color) {
     $ratio: ledSizeRatio($size);
-    @return inset $color 0 (-1px / $ratio) (9px / $ratio);
+    @return inset $color 0 calc(-1px / $ratio) calc(9px / $ratio);
 }
 
 @function ledGlowShadow($size, $color, $on: false) {
@@ -65,10 +65,10 @@ $ledColors: (
     $t: 0;
     
     @if $on {
-        $t: $size / 2;
+        $t: calc($size / 2);
     }
     
-    @return $color 0 (2px / $ratio) $t;
+    @return $color 0 calc(2px / $ratio) $t;
 }
 
 @mixin led-color($size, $bgColor, $color1, $color2, $on: false) {

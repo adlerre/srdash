@@ -2,7 +2,10 @@ import { Component, OnInit } from "@angular/core";
 
 import { Subscription } from "rxjs";
 
-import { Packet, CarTelemetryData, CarStatusData, LapData, SessionData, SessionType, TYRE_SPECS, CompoundInfo } from "../definitions";
+import {
+    Packet, CarTelemetryData, CarStatusData, CarDamageData, LapData, SessionData,
+    SessionType, TYRE_SPECS, CompoundInfo, LapHistoryData, PacketSessionHistoryData
+} from "../definitions";
 import { DashboardService } from "./dashboard.service";
 
 @Component({
@@ -14,17 +17,21 @@ export class DashboardComponent implements OnInit {
 
     socket: Subscription;
 
+    version: number;
+
     carTelemetryData: CarTelemetryData;
 
     carStatusData: CarStatusData;
+
+    carDamageData: CarDamageData;
 
     sessionData: SessionData;
 
     lapData: LapData;
 
-    ersStoreEngeryMax = 4000000;
+    lapHistoryData: Array<LapHistoryData>;
 
-    tyresDamage = 0;
+    ersStoreEngeryMax = 4000000;
 
     maxFuelInTank = 0;
 
@@ -89,24 +96,49 @@ export class DashboardComponent implements OnInit {
         return TYRE_SPECS[tyreCompound] || null;
     }
 
+    public getBestLapTime() {
+        return this.lapData && this.lapData.bestLapTime || this.lapHistoryData && this.lapHistoryData.reduce(this.bestTime("lapTime")).lapTime;
+    }
+
+    public getTyreDamage(tyre: string) {
+        const tyresDamage = this.carStatusData && this.carStatusData.tyresDamage || this.carDamageData && this.carDamageData.tyresDamage;
+        return tyresDamage && tyresDamage[tyre] || 0;
+    }
+
+    public min(a: number, b: number) {
+        return Math.min(a, b);
+    }
+
+    public max(a: number, b: number) {
+        return Math.max(a, b);
+    }
+
     private handlePacket(packet: Packet) {
         if (packet && packet.header) {
+            this.version = packet.header.packetFormat;
             const playerCarIndex = packet.header.playerCarIndex;
             if (packet.carTelemetryData) {
                 this.carTelemetryData = packet.carTelemetryData[playerCarIndex];
             } else if (packet.carStatuses) {
                 this.carStatusData = packet.carStatuses[playerCarIndex];
-                this.tyresDamage = Math.max(
-                    this.carStatusData.tyresDamage.frontLeft,
-                    this.carStatusData.tyresDamage.frontRight,
-                    this.carStatusData.tyresDamage.rearLeft,
-                    this.carStatusData.tyresDamage.rearRight
-                );
+            } else if (packet.carDamages) {
+                this.carDamageData = packet.carDamages[playerCarIndex];
             } else if (packet.lapDataList) {
                 this.lapData = packet.lapDataList[playerCarIndex];
-            } else if ((<SessionData>packet).weather) {
+            } else if (packet.header.packetId === 1) {
                 this.sessionData = packet;
+            } else if (packet.header.packetId == 11 && playerCarIndex === (<PacketSessionHistoryData>packet).carIdx) {
+                this.lapHistoryData = (<PacketSessionHistoryData>packet).lapHistoryData;
             }
+        }
+    }
+
+    private bestTime(property: string) {
+        return (a: LapHistoryData, b: LapHistoryData) => {
+            const ap = a[property];
+            const bp = b[property];
+
+            return ap === 0 && bp === 0 || ap !== 0 && bp === 0 ? a : ap === 0 && bp !== 0 ? b : ap < bp ? a : b;
         }
     }
 

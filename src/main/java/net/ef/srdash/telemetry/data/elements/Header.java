@@ -21,6 +21,8 @@ public class Header {
     private long frameIdentifier;
 
     private int playerCarIndex;
+    
+    private int secondaryPlayerCarIndex;
 
     public Header() {
     }
@@ -112,6 +114,22 @@ public class Header {
     public void setPlayerCarIndex(int playerCarIndex) {
         this.playerCarIndex = playerCarIndex;
     }
+    
+    /**
+     * @return the secondaryPlayerCarIndex
+     * @since 2021
+     */
+    public int getSecondaryPlayerCarIndex() {
+        return secondaryPlayerCarIndex;
+    }
+
+    /**
+     * @param secondaryPlayerCarIndex the secondaryPlayerCarIndex to set
+     * @since 2021
+     */
+    public void setSecondaryPlayerCarIndex(int secondaryPlayerCarIndex) {
+        this.secondaryPlayerCarIndex = secondaryPlayerCarIndex;
+    }
 
     @Override
     public String toString() {
@@ -121,6 +139,7 @@ public class Header {
                 ", sessionUID:" + this.getSessionUID() +
                 ", sessionTime:" + this.getSessionTime() +
                 ", frameIdentifier:" + this.getFrameIdentifier() +
-                ", playerCarIndex:" + this.getPlayerCarIndex();
+                ", playerCarIndex:" + this.getPlayerCarIndex() +
+                ", secondaryPlayerCarIndex:" + this.getSecondaryPlayerCarIndex();
     }
 }

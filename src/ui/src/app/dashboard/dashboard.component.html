@@ -25,10 +25,16 @@
     </div>
 </ng-template>
 
-<ng-template #tyreTemp let-id="id" let-compoundInfo="compoundInfo" let-temperature="temperature">
-    <div id="{{ id }}" class="center-items"
-        [ngClass]="{'text-success': temperature >= compoundInfo?.temperature[0] && temperature <= compoundInfo?.temperature[1], 'text-danger': temperature > compoundInfo?.temperature[1], 'text-warning': temperature < compoundInfo?.temperature[0]}">
-        {{ temperature || '--' }}</div>
+<ng-template #tyreInfo let-id="id" let-compoundInfo="compoundInfo" let-temperature="temperature" let-damage="damage">
+    <div class="center-items h-50">
+        <div>
+            <div id="{{ id }}Temp"
+                [ngClass]="{'text-success': temperature >= compoundInfo?.temperature[0] && temperature <= compoundInfo?.temperature[1], 'text-danger': temperature > compoundInfo?.temperature[1], 'text-warning': temperature < compoundInfo?.temperature[0]}">
+                {{ temperature || '--' }}
+            </div>
+            <div id="{{ id }}Damage" class="fs-6">({{ damage }}%)</div>
+        </div>
+    </div>
 </ng-template>
 
 <ng-template #esrInfo let-esrUsage="esrUsage">
@@ -81,31 +87,26 @@
         </div>
 
         <div class="d-grid grid-3">
-            <div class="d-grid border border-thicker info-box">
-                <div class="d-grid grid-2 border border-thick tyre-speed-box bg-gray">
-                    <div class="border-right text-center">
-                        <div id="tyreCompound"
-                            [class]="getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17)?.short">
-                            <span>{{ getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17)?.short }}</span>
-                        </div>
-                        <div id="tyresDamage">{{ tyresDamage }}%</div>
-                    </div>
+            <div class="d-grid border border-thicker border-radius-3 info-box">
+                <div class="border border-thick bg-gray">
                     <div class="text-right">
                         <div id="speed">{{ carTelemetryData?.speed || 0 }} KM/H</div>
                     </div>
                 </div>
-                <div class="d-grid grid-2 border border-inset border-thick">
+                <div class="d-grid grid-2 border border-light">
                     <div>
                         <div id="currentLapNum" class="center-items">
-                            <span>{{ 'dashboard.lap' | translate:{lap: lapData?.currentLapNum || '--'} }}</span>
-                            <span *ngIf="sessionData?.totalLaps && sessionData?.totalLaps > 1"> /
+                            <span>{{ 'dashboard.lap' | translate:{lap: min(lapData?.currentLapNum, sessionData?.totalLaps) || '--'} }}</span>
+                            <span
+                                *ngIf="sessionData?.totalLaps && sessionData?.totalLaps > 1 && sessionData?.totalLaps < 200">
+                                /
                                 {{ sessionData?.totalLaps }}</span>
                         </div>
                         <div id="bestLapTime" class="center-items"
-                            [ngClass]="{'text-success': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime === 0}">
-                            <span *ngIf="!lapData?.bestLapTime || lapData?.bestLapTime === 0">--</span>
+                            [ngClass]="{'text-success': getBestLapTime() && lapData?.lastLapTime && getBestLapTime() - lapData?.lastLapTime === 0}">
+                            <span *ngIf="!getBestLapTime() || getBestLapTime() === 0">--</span>
                             <span
-                                *ngIf="lapData?.bestLapTime && lapData?.bestLapTime !== 0">{{ floatToTime(lapData?.bestLapTime) }}</span>
+                                *ngIf="getBestLapTime() && getBestLapTime() !== 0">{{ floatToTime(getBestLapTime()) }}</span>
                         </div>
 
                     </div>
@@ -114,11 +115,11 @@
                             <span>{{ 'dashboard.position' | translate:{position: lapData?.carPosition || '--'} }}</span>
                         </div>
                         <div id="difference" class="center-items"
-                            [ngClass]="{'text-success': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime > 0, 'text-danger': lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime < 0 }">
+                            [ngClass]="{'text-success': getBestLapTime() && lapData?.lastLapTime && getBestLapTime() - lapData?.lastLapTime > 0, 'text-danger': getBestLapTime() && lapData?.lastLapTime && getBestLapTime() - lapData?.lastLapTime < 0 }">
                             <span
-                                *ngIf="(!lapData?.bestLapTime || !lapData?.lastLapTime) || (lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime === 0)">--</span>
+                                *ngIf="(!getBestLapTime() || !lapData?.lastLapTime) || (getBestLapTime() && lapData?.lastLapTime && (getBestLapTime() - lapData?.lastLapTime === 0))">--</span>
                             <span
-                                *ngIf="lapData?.bestLapTime && lapData?.lastLapTime && lapData?.bestLapTime - lapData?.lastLapTime !== 0">{{ floatToTime(lapData?.bestLapTime - lapData?.lastLapTime) }}</span>
+                                *ngIf="getBestLapTime() && lapData?.lastLapTime && (getBestLapTime() - lapData?.lastLapTime !== 0)">{{ floatToTime(getBestLapTime() - lapData?.lastLapTime) }}</span>
                         </div>
                     </div>
                 </div>
@@ -137,17 +138,17 @@
                     </div>
                 </div>
             </div>
-            <div class="d-grid border border-thicker info-box">
+            <div class="d-grid border border-thicker border-radius-3 info-box">
                 <div class="border border-thick text-center bg-gray">
                     <div id="currentLapTime">{{ floatToTime(lapData?.currentLapTime || 0) }}</div>
                 </div>
-                <div class="d-grid grid-3 text-center border border-inset border-thick">
+                <div class="d-grid grid-3 text-center border border-light">
                     <div>
                         <ng-container
-                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreFrontLeftTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.frontLeft || 0}">
+                            *ngTemplateOutlet="tyreInfo;context:{id: 'tyreFrontLeft', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.frontLeft || 0, damage: getTyreDamage('frontLeft') }">
                         </ng-container>
                         <ng-container
-                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreFrontRightTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.frontRight || 0}">
+                            *ngTemplateOutlet="tyreInfo;context:{id: 'tyreRearLeft', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearLeft || 0, damage: getTyreDamage('rearLeft') }">
                         </ng-container>
                     </div>
                     <div class="center-items">
@@ -160,10 +161,10 @@
                     </div>
                     <div>
                         <ng-container
-                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreRearLeftTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearLeft || 0}">
+                            *ngTemplateOutlet="tyreInfo;context:{id: 'tyreFrontRight', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.frontRight || 0, damage: getTyreDamage('frontRight') }">
                         </ng-container>
                         <ng-container
-                            *ngTemplateOutlet="tyreTemp;context:{id: 'tyreRearRightTemp', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearRight || 0}">
+                            *ngTemplateOutlet="tyreInfo;context:{id: 'tyreRearRight', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearRight || 0, damage: getTyreDamage('rearRight') }">
                         </ng-container>
                     </div>
                 </div>
