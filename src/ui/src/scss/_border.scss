@@ -1,9 +1,16 @@
+$border-colors: $colors !default;
 $border-radius-sizes: (0,1,2,3,4,5);
 
 .border {
     border-width: 1px;
     border-color: dimgray;
     border-style: solid;
+}
+
+@each $name, $color in $border-colors {
+    .border-#{$name} {
+        border-color: $color !important;
+    }
 }
 
 .border-light {

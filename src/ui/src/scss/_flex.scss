@@ -50,3 +50,11 @@ $flexAlignTypes: (
         }
     };
 };
+
+.flex-fill {
+    flex: 1 1 auto!important;
+}
+
+.flex-column {
+    flex-direction: column!important;
+}

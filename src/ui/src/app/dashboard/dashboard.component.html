@@ -25,49 +25,24 @@
     </div>
 </ng-template>
 
-<ng-template #tyreInfo let-id="id" let-compoundInfo="compoundInfo" let-temperature="temperature" let-damage="damage">
-    <div class="center-items h-50">
-        <div>
-            <div id="{{ id }}Temp"
-                [ngClass]="{'text-success': temperature >= compoundInfo?.temperature[0] && temperature <= compoundInfo?.temperature[1], 'text-danger': temperature > compoundInfo?.temperature[1], 'text-warning': temperature < compoundInfo?.temperature[0]}">
-                {{ temperature || '--' }}
-            </div>
-            <div id="{{ id }}Damage" class="fs-6">({{ damage }}%)</div>
-        </div>
-    </div>
-</ng-template>
-
 <ng-template #esrInfo let-esrUsage="esrUsage">
-    <div *ngIf="carStatusData?.ersStoreEngery !== 0" class="d-grid grid-3 my-4 ers-info">
-        <div id="ersDeployMode"><i class="fas fa-bolt"></i> {{ carStatusData?.ersDeployMode || 0 }}</div>
-        <div class="progressbar ers">
-            <div id="ersPercent" [style.width]="esrUsage + '%'"></div>
+    <fieldset class="p-0 border-warning"
+        *ngIf="!carStatusData?.drsActivationDistance || carStatusData?.drsActivationDistance === 0">
+        <legend>{{ 'dashboard.legend.ers' | translate }}</legend>
+        <div class="d-flex h-100 align-items-center ers-info">
+            <div id="ersDeployMode"><i class="fas fa-bolt"></i> {{ carStatusData?.ersDeployMode || 0 }}</div>
+            <div class="progressbar ers flex-fill">
+                <div id="ersPercent" [style.width]="esrUsage + '%'"></div>
+            </div>
+            <div id="ersPercentLabel">{{ esrUsage }}%</div>
         </div>
-        <div id="ersPercentLabel">{{ esrUsage }}%</div>
-    </div>
+    </fieldset>
 </ng-template>
 
-<ng-template #fuelInfo let-reserve="reserve">
-    <div class="d-grid grid-3 my-4 fuel-info">
-        <div id="fuelMix">
-            <small *ngIf="carStatusData?.fuelRemainingLaps" class="d-inline text-lighter fs-6 pr-1"
-                [ngClass]="{'text-success': reserve > 0, 'text-danger': reserve < 0}">({{ (reserve > 0 ? '+' : reserve < 0 ? '-' : '') + (reserve | number: '1.2-2') }})</small>
-            <i class="fas fa-gas-pump" [ngClass]="{'text-success': reserve > 0, 'text-danger': reserve < 0}"></i>
-            {{ carStatusData?.fuelMix + 1 || 0 }}
-        </div>
-        <div class="progressbar fuel">
-            <div id="fuelPercent" [style.width]="(100 / carStatusData?.fuelCapacity * carStatusData?.fuelInTank) + '%'">
-            </div>
-        </div>
-        <div id="fuelLabel" [ngClass]="{'text-success': reserve > 0, 'text-danger': reserve < 0}">
-            {{ 'dashboard.fuelMass' | translate:{mass: (carStatusData?.fuelInTank || 0) | number: '1.1-1'} }}
-        </div>
-    </div>
-</ng-template>
 <!-- -- TEMPLATES -- -->
 
 <div class="screen-center">
-    <div id="dashboard" class="m-2">
+    <div id="dashboard" class="p-2 w-100">
         <div class="d-grid grid-3 led-stripe">
             <div class="center-items mb-3">
                 <ng-container *ngTemplateOutlet="multiPurposeLed;context"></ng-container>
@@ -86,95 +61,201 @@
             </div>
         </div>
 
-        <div class="d-grid grid-3">
-            <div class="d-grid border border-thicker border-radius-3 info-box">
-                <div class="border border-thick bg-gray">
-                    <div class="text-right">
-                        <div id="speed">{{ carTelemetryData?.speed || 0 }} KM/H</div>
+        <div>
+            <div class="d-flex">
+                <fieldset class="flex-fill border-info">
+                    <legend>{{ 'dashboard.legend.breakBias' | translate }}</legend>
+                    <span class="fs-2">{{ carStatusData?.frontBrakeBias || '--' }}</span>
+                </fieldset>
+
+                <fieldset class="flex-fill border-success">
+                    <legend>{{ 'dashboard.legend.differential' | translate }}</legend>
+                    <span class="fs-2">{{ carSetupData?.onThrottle || '--' }}</span>
+                </fieldset>
+
+                <fieldset class="border-lightblue flex-fill">
+                    <legend>{{ 'dashboard.legend.rpm' | translate }}</legend>
+                    <span class="fs-2">{{ carTelemetryData?.engineRpm || 0 }}</span>
+                </fieldset>
+
+                <fieldset class="border-purple flex-fill">
+                    <legend>{{ 'dashboard.legend.speed' | translate }}</legend>
+                    <span class="fs-2">{{ carTelemetryData?.speed || 0 }}</span>
+                </fieldset>
+
+                <fieldset class="flex-fill p-0 pt-1 d-flex">
+                    <legend>{{ 'dashboard.legend.engine' | translate }}</legend>
+                    <div class="d-inline-flex flex-column flex-fill justify-content-center"
+                        [ngClass]="{'bg-success': carTelemetryData?.engineTemperature < 135, 'bg-danger': carTelemetryData?.engineTemperature >= 135}">
+                        <div class="fs-2 degree">
+                            {{ carTelemetryData?.engineTemperature || '--' }}</div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="d-flex">
+                <div class="d-flex flex-column align-items-center pr-1">
+                    <div>
+                        <ng-container *ngTemplateOutlet="flagLed;context"></ng-container>
+                    </div>
+                    <div class="progressbar vertical pedal-break mt-2 bg-eigengrau">
+                        <div [style.height]="(carTelemetryData?.brake || 0) + '%'"></div>
                     </div>
                 </div>
-                <div class="d-grid grid-2 border border-light">
-                    <div>
-                        <div id="currentLapNum" class="center-items">
-                            <span>{{ 'dashboard.lap' | translate:{lap: min(lapData?.currentLapNum, sessionData?.totalLaps) || '--'} }}</span>
-                            <span
-                                *ngIf="sessionData?.totalLaps && sessionData?.totalLaps > 1 && sessionData?.totalLaps < 200">
-                                /
-                                {{ sessionData?.totalLaps }}</span>
-                        </div>
-                        <div id="bestLapTime" class="center-items"
-                            [ngClass]="{'text-success': getBestLapTime() && lapData?.lastLapTime && getBestLapTime() - lapData?.lastLapTime === 0}">
-                            <span *ngIf="!getBestLapTime() || getBestLapTime() === 0">--</span>
-                            <span
-                                *ngIf="getBestLapTime() && getBestLapTime() !== 0">{{ floatToTime(getBestLapTime()) }}</span>
+
+                <div class="flex-fill">
+                    <div class="d-grid grid-3">
+                        <div class="d-grid grid-2">
+                            <ng-template #tyreInfo2 let-type="type" let-compoundInfo="compoundInfo">
+                                <fieldset class="p-0 pt-1 d-flex">
+                                    <legend>{{ 'dashboard.legend.tyreTemp' | translate }}
+                                        {{ 'dashboard.wheel.' + type | translate }}</legend>
+                                    <div class="d-inline-flex flex-column flex-fill justify-content-center"
+                                        [ngClass]="{'bg-success': carTelemetryData?.tyreInnerTemperature[type] >= compoundInfo?.temperature[0] && carTelemetryData?.tyreInnerTemperature[type] <= compoundInfo?.temperature[1], 'bg-danger': carTelemetryData?.tyreInnerTemperature[type] > compoundInfo?.temperature[1], 'bg-warning': carTelemetryData?.tyreInnerTemperature[type] < compoundInfo?.temperature[0]}">
+                                        <div class="fs-3 degree">
+                                            {{ carTelemetryData?.tyreInnerTemperature[type] || '--' }}
+                                        </div>
+                                        <div class="fs-5">{{ getTyreDamage(type) || 0 }}%</div>
+                                    </div>
+                                </fieldset>
+                            </ng-template>
+
+                            <ng-container
+                                *ngTemplateOutlet="tyreInfo2;context:{type: 'frontLeft', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17)}">
+                            </ng-container>
+                            <ng-container
+                                *ngTemplateOutlet="tyreInfo2;context:{type: 'frontRight', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17)}">
+                            </ng-container>
+
+                            <ng-container
+                                *ngTemplateOutlet="tyreInfo2;context:{type: 'rearLeft', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17)}">
+                            </ng-container>
+                            <ng-container
+                                *ngTemplateOutlet="tyreInfo2;context:{type: 'rearRight', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17)}">
+                            </ng-container>
                         </div>
 
+                        <div>
+                            <fieldset>
+                                <legend>{{ 'dashboard.legend.gear' | translate }}</legend>
+                                <div id="gear">
+                                    <span
+                                        [ngClass]="{'text-warning': (carTelemetryData?.revLightsPercent || 0) >= 70 && (carTelemetryData?.revLightsPercent || 0) < 90, 'text-danger': (carTelemetryData?.revLightsPercent || 0) >= 90}">{{ !carTelemetryData || !carTelemetryData?.gear || carTelemetryData?.gear === 0 ? 'N' : carTelemetryData?.gear === -1 ? 'R' : carTelemetryData?.gear }}</span>
+                                </div>
+                            </fieldset>
+                        </div>
+
+                        <div class="d-grid grid-2">
+                            <ng-template #breakInfo let-type="type">
+                                <fieldset class="p-0 pt-1 d-flex">
+                                    <legend>{{ 'dashboard.legend.breakTemp' | translate }}
+                                        {{ 'dashboard.wheel.' + type | translate }}</legend>
+                                    <div class="d-inline-flex flex-column flex-fill justify-content-center"
+                                        [ngClass]="{'bg-success': carTelemetryData?.brakeTemperature[type] <= 700, 'bg-warning': carTelemetryData?.brakeTemperature[type] > 700 && carTelemetryData?.brakeTemperature[type] < 900, 'bg-danger': carTelemetryData?.brakeTemperature[type] >= 900}">
+                                        <div class="fs-3 degree">{{ carTelemetryData?.brakeTemperature[type] || '--' }}
+                                        </div>
+                                        <div class="fs-5">{{ carDamageData?.brakesDamage[type] || 0 }}%</div>
+                                    </div>
+                                </fieldset>
+                            </ng-template>
+
+                            <ng-container *ngTemplateOutlet="breakInfo;context:{type: 'frontLeft'}">
+                            </ng-container>
+                            <ng-container *ngTemplateOutlet="breakInfo;context:{type: 'frontRight'}">
+                            </ng-container>
+
+                            <ng-container *ngTemplateOutlet="breakInfo;context:{type: 'rearLeft'}">
+                            </ng-container>
+                            <ng-container *ngTemplateOutlet="breakInfo;context:{type: 'rearRight'}">
+                            </ng-container>
+                        </div>
                     </div>
+
+                    <div class="d-grid grid-3">
+                        <fieldset>
+                            <legend>{{ 'dashboard.legend.bestLapTime' | translate }}</legend>
+                            <div class="fs-1"
+                                [ngClass]="{'text-success': getBestLapTime() && lapData?.lastLapTime && getBestLapTime() - lapData?.lastLapTime === 0}">
+                                <span>{{ floatToTime(getBestLapTime() || 0) }}</span>
+                            </div>
+                        </fieldset>
+
+                        <!-- ERS/DRS -->
+                        <ng-container *ngTemplateOutlet="esrInfo;context:{esrUsage: calcESRUsage()}">
+                        </ng-container>
+
+                        <fieldset class="p-0 pt-1 d-flex"
+                            *ngIf="carStatusData?.drsActivationDistance && carStatusData?.drsActivationDistance !== 0">
+                            <legend>{{ 'dashboard.legend.drs' | translate }}</legend>
+                            <div class="d-inline-flex flex-column flex-fill justify-content-center bg-warning">
+                                <span class="fs-1">{{ carStatusData?.drsActivationDistance }}m</span>
+                            </div>
+
+                        </fieldset>
+                        <!-- ------ -->
+
+                        <fieldset>
+                            <legend>{{ 'dashboard.legend.currentLapTime' | translate }}</legend>
+                            <div class="fs-1">{{ floatToTime(lapData?.currentLapTime || 0) }}</div>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column align-items-center pl-1">
                     <div>
-                        <div id="carPosition" class="center-items">
-                            <span>{{ 'dashboard.position' | translate:{position: lapData?.carPosition || '--'} }}</span>
-                        </div>
-                        <div id="difference" class="center-items"
-                            [ngClass]="{'text-success': getBestLapTime() && lapData?.lastLapTime && getBestLapTime() - lapData?.lastLapTime > 0, 'text-danger': getBestLapTime() && lapData?.lastLapTime && getBestLapTime() - lapData?.lastLapTime < 0 }">
-                            <span
-                                *ngIf="(!getBestLapTime() || !lapData?.lastLapTime) || (getBestLapTime() && lapData?.lastLapTime && (getBestLapTime() - lapData?.lastLapTime === 0))">--</span>
-                            <span
-                                *ngIf="getBestLapTime() && lapData?.lastLapTime && (getBestLapTime() - lapData?.lastLapTime !== 0)">{{ floatToTime(getBestLapTime() - lapData?.lastLapTime) }}</span>
-                        </div>
+                        <ng-container *ngTemplateOutlet="flagLed;context"></ng-container>
+                    </div>
+                    <div class="progressbar vertical pedal-throttle mt-2 bg-eigengrau">
+                        <div [style.height]="(carTelemetryData?.throttle || 0) + '%'"></div>
                     </div>
                 </div>
             </div>
-            <div class="text-center">
-                <div class="d-grid grid-3">
-                    <div class="justify-self-start align-self-center pl-2">
-                        <ng-container *ngTemplateOutlet="flagLed;context"></ng-container>
+
+            <div class="d-flex">
+                <fieldset class="flex-fill d-flex p-0 pt-1">
+                    <legend>{{ 'dashboard.legend.lap' | translate }}</legend>
+                    <div class="d-inline-flex flex-fill justify-content-center bg-silver">
+                        <span class="fs-2">{{ min(lapData?.currentLapNum, sessionData?.totalLaps) || '--' }}{{ sessionData?.totalLaps && sessionData?.totalLaps > 1 && sessionData?.totalLaps < 200 ? ' / ' + sessionData?.totalLaps : '' }}</span>
                     </div>
-                    <div id="gear"
-                        [ngClass]="{'text-warning': (carTelemetryData?.revLightsPercent || 0) >= 70 && (carTelemetryData?.revLightsPercent || 0) < 90, 'text-danger': (carTelemetryData?.revLightsPercent || 0) >= 90}">
-                        {{ !carTelemetryData || !carTelemetryData?.gear || carTelemetryData?.gear === 0 ? 'N' : carTelemetryData?.gear === -1 ? 'R' : carTelemetryData?.gear }}
+                </fieldset>
+
+                <fieldset class="flex-fill d-flex p-0 pt-1">
+                    <legend>{{ 'dashboard.legend.position' | translate }}</legend>
+                    <div class="d-inline-flex flex-fill justify-content-center bg-silver">
+                        <span class="fs-2">{{ lapData?.carPosition || '--' }}</span>
                     </div>
-                    <div class="justify-self-end align-self-center pr-2">
-                        <ng-container *ngTemplateOutlet="flagLed;context"></ng-container>
+                </fieldset>
+
+                <fieldset class="flex-fill d-flex p-0 pt-1">
+                    <legend>{{ 'dashboard.legend.fuelMix' | translate }}</legend>
+                    <div class="d-inline-flex flex-fill justify-content-center bg-silver">
+                        <span class="fs-2">{{ carStatusData?.fuelMix + 1 || 0 }}</span>
                     </div>
-                </div>
-            </div>
-            <div class="d-grid border border-thicker border-radius-3 info-box">
-                <div class="border border-thick text-center bg-gray">
-                    <div id="currentLapTime">{{ floatToTime(lapData?.currentLapTime || 0) }}</div>
-                </div>
-                <div class="d-grid grid-3 text-center border border-light">
-                    <div>
-                        <ng-container
-                            *ngTemplateOutlet="tyreInfo;context:{id: 'tyreFrontLeft', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.frontLeft || 0, damage: getTyreDamage('frontLeft') }">
-                        </ng-container>
-                        <ng-container
-                            *ngTemplateOutlet="tyreInfo;context:{id: 'tyreRearLeft', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearLeft || 0, damage: getTyreDamage('rearLeft') }">
-                        </ng-container>
+                </fieldset>
+
+                <fieldset class="flex-fill d-flex p-0 pt-1 border-orange">
+                    <legend>{{ 'dashboard.legend.fuelMass' | translate }}</legend>
+                    <div class="d-inline-flex flex-fill justify-content-center bg-orange">
+                        <span class="fs-2">{{ (carStatusData?.fuelInTank || 0) | number: '1.1-1' }}</span>
                     </div>
-                    <div class="center-items">
-                        <div class="d-grid">
-                            <div class="text-transform-uppercase">{{ 'dashboard.engine.short' | translate }}</div>
-                            <div id="engineTemp"
-                                [ngClass]="{'text-success': carTelemetryData?.engineTemperature < 135, 'text-danger': carTelemetryData?.engineTemperature >= 135}">
-                                {{ carTelemetryData?.engineTemperature || '--' }}</div>
+                </fieldset>
+
+                <ng-template #fuelReserve let-reserve="reserve">
+                    <fieldset class="flex-fill p-0 pt-1 d-flex"
+                        [ngClass]="{'border-success': reserve > 0, 'border-danger': reserve < 0}">
+                        <legend>{{ 'dashboard.legend.fuelRemaining' | translate }}</legend>
+
+                        <div class="d-inline-flex flex-fill justify-content-center"
+                            [ngClass]="{'bg-success': reserve > 0, 'bg-danger': reserve < 0, 'bg-silver': reserve === 0}">
+                            <span
+                                class="fs-2">{{ (reserve > 0 ? '+' : reserve < 0 ? '-' : '') + (reserve | number: '1.1-1') }}</span>
                         </div>
-                    </div>
-                    <div>
-                        <ng-container
-                            *ngTemplateOutlet="tyreInfo;context:{id: 'tyreFrontRight', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.frontRight || 0, damage: getTyreDamage('frontRight') }">
-                        </ng-container>
-                        <ng-container
-                            *ngTemplateOutlet="tyreInfo;context:{id: 'tyreRearRight', compoundInfo: getTyreCompoundInfo(carStatusData?.tyreVisualCompound || carStatusData?.tyreCompound || 17), temperature: carTelemetryData?.tyreInnerTemperature?.rearRight || 0, damage: getTyreDamage('rearRight') }">
-                        </ng-container>
-                    </div>
-                </div>
+                    </fieldset>
+                </ng-template>
+                <ng-container
+                    *ngTemplateOutlet="fuelReserve;context:{reserve: carStatusData?.fuelRemainingLaps || calcFuelReserve()}">
+                </ng-container>
             </div>
         </div>
-
-
-        <ng-container *ngTemplateOutlet="esrInfo;context:{esrUsage: calcESRUsage()}"></ng-container>
-        <ng-container
-            *ngTemplateOutlet="fuelInfo;context:{reserve: carStatusData?.fuelRemainingLaps || calcFuelReserve()}">
-        </ng-container>
     </div>
 </div>

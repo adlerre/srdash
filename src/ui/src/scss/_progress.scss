@@ -6,13 +6,23 @@ $progressFg: lime !default;
     display: block;
     background-color: $progressBg;
     height: 1rem;
-
+    
     >div {
-       position: absolute;
+        position: absolute;
         display: block;
         top: 0;
         left: 0;
         bottom: 0;
         background-color: $progressFg;
+    }
+    
+    &.vertical {
+        width: 1em;
+        height: 100%;
+        
+        >div {
+            width: 1em;
+            top: unset;
+        }
     }
 }

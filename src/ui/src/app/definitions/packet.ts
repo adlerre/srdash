@@ -14,6 +14,7 @@ export interface Packet {
     carStatuses?: Array<CarStatusData>;
     lapDataList?: Array<LapData>;
     carDamages?: Array<CarDamageData>;
+    carSetups?: Array<CarSetupData>;
 }
 
 export interface WheelData<T> {
@@ -91,6 +92,33 @@ export interface CarDamageData {
     engineICEWear?: number;
     engineMGUKWear?: number;
     engineTCWear?: number;
+}
+
+export interface CarSetupData {
+    frontWing?: number;
+    rearWing?: number;
+    onThrottle?: number;
+    offThrottle?: number;
+    frontCamber?: number;
+    rearCamber?: number;
+    frontToe?: number;
+    rearToe?: number;
+    frontSuspension?: number;
+    rearSuspension?: number;
+    frontAntiRollBar?: number;
+    rearAntiRollBar?: number;
+    frontSuspensionHeight?: number;
+    rearSuspensionHeight?: number;
+    brakePressure?: number;
+    brakeBias?: number;
+    frontTyrePressure?: number;
+    rearTyrePressure?: number;
+    rearLeftTyrePressure?: number;
+    rearRightTyrePressure?: number;
+    frontLeftTyrePressure?: number;
+    frontRightTyrePressure?: number;
+    ballast?: number;
+    fuelLoad?: number;
 }
 
 export enum PitStatus {

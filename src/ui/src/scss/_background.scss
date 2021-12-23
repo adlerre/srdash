@@ -1,0 +1,8 @@
+$bg-colors: $colors !default;
+
+@each $name, $color in $bg-colors {
+    .bg-#{$name} {
+        background-color: $color !important;
+        color: color-yiq($color);
+    }
+}

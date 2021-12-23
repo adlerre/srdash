@@ -1,5 +1,8 @@
 @import "./variables";
 
+@import "./functions";
+
+@import "./background";
 @import "./border";
 @import "./button";
 @import "./flex";
@@ -21,6 +24,7 @@ $fa-font-path: "../../../../node_modules/@fortawesome/fontawesome-free/webfonts/
 @import "~@fortawesome/fontawesome-free/scss/regular.scss";
 
 @import "~@fontsource/dseg14/index.css";
+@import "~@fontsource/dseg14/700.css";
 
 html, body {
     margin: 0;
@@ -49,6 +53,16 @@ footer {
     width: 100%;
 }
 
+fieldset {
+    @extend .border;
+    border-radius: 3px;
+    border-width: 5px;
+    
+    legend {
+        text-transform: uppercase;
+    }
+}
+
 .screen-center {
     display: flex;
     flex-direction: column;
@@ -56,6 +70,10 @@ footer {
     align-items: center;
     text-align: center;
     min-height: 100vh;
+    
+//    width: 1024px;
+//    height: 720px;
+//    border: 1px solid #fff;
 }
 
 .h-50 {
@@ -63,11 +81,11 @@ footer {
 }
 
 .h-100 {
-    height: 50% !important;
+    height: 100% !important;
 }
 
-.bg-gray {
-    background-color: dimgray;
+.w-100 {
+    width: 100% !important;
 }
 
 .grid-2 {
@@ -133,7 +151,7 @@ footer {
     align-items: center;
     
     color: yellow;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     
     >*:nth-child(1) {
         text-align: right;
@@ -146,7 +164,7 @@ footer {
     }
 
     .progressbar {
-        height: 2rem;
+        height: 1.5rem;
         
         >div {
             background-color: yellow;
@@ -154,30 +172,27 @@ footer {
     }
 }
 
-.fuel-info {
-    grid-template-columns: 1fr 4fr 1fr !important;
-    justify-content: center;
-    align-items: center;
-    
-    color: lime;
-    font-size: 1.4rem;
-    
-    >*:nth-child(1) {
-        text-align: right;
-        padding: 0 0.5rem;
+.pedal-break {
+    &.progressbar {
+        width: 0.8em;
+        border-radius: 2px;
+        background-color: #16161d;
+        > div {
+            width: 0.8em;
+            border-radius: 2px;
+            background-color: red;
+        }
     }
+}
 
-    >*:nth-child(3) {
-        color: #fff;
-        text-align: left;
-        padding: 0 0.5rem;
-    }
-
-    .progressbar {
-        height: 2rem;
-        
-        >div {
-            background-color: lime;
+.pedal-throttle {
+    &.progressbar {
+        width: 0.8em;
+        border-radius: 2px;
+        > div {
+           width: 0.8em;
+           border-radius: 2px;
+           background-color: lime;
         }
     }
 }
@@ -204,41 +219,36 @@ footer {
     }
 }
 
-#speed,
-#currentLapTime {
-    font-size: 2.5rem;
-}
-
-#bestLapTime,
-#currentLapNum,
-#curDifference,
-#carPosition,
-#difference {
-    font-size: 2rem;
-    min-height: 50%;
-}
-
-#engineTemp {
-    font-size: 1.5rem;
-}
-
-#tyreFrontLeftTemp,
-#tyreFrontRightTemp,
-#tyreRearLeftTemp,
-#tyreRearRightTemp {
-    font-size: 1.5rem;
-}
-
-#engineTemp::after,
-#tyreFrontLeftTemp::after,
-#tyreFrontRightTemp::after,
-#tyreRearLeftTemp::after,
-#tyreRearRightTemp::after {
-    content: '\2103';
-    padding-left: 0.25rem;
+.degree {
+    &::after {
+       content: '\2103';
+        padding-left: 0.25rem;
+    }
 }
 
 #gear {
     font-family: "DSEG14";
     font-size: 12rem;
+    font-weight: 700;
+    position: relative;
+    
+    >span {
+        position: relative;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;    
+    }
+    
+    &::before {
+        content: '~';
+        color: #0f0f0f;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+    }
 }

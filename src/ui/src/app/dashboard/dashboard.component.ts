@@ -3,7 +3,7 @@ import { Component, OnInit } from "@angular/core";
 import { Subscription } from "rxjs";
 
 import {
-    Packet, CarTelemetryData, CarStatusData, CarDamageData, LapData, SessionData,
+    Packet, CarTelemetryData, CarStatusData, CarDamageData, CarSetupData, LapData, SessionData,
     SessionType, TYRE_SPECS, CompoundInfo, LapHistoryData, PacketSessionHistoryData
 } from "../definitions";
 import { DashboardService } from "./dashboard.service";
@@ -24,6 +24,8 @@ export class DashboardComponent implements OnInit {
     carStatusData: CarStatusData;
 
     carDamageData: CarDamageData;
+
+    carSetupData: CarSetupData;
 
     sessionData: SessionData;
 
@@ -123,6 +125,8 @@ export class DashboardComponent implements OnInit {
                 this.carStatusData = packet.carStatuses[playerCarIndex];
             } else if (packet.carDamages) {
                 this.carDamageData = packet.carDamages[playerCarIndex];
+            } else if (packet.carSetups) {
+                this.carSetupData = packet.carSetups[playerCarIndex];
             } else if (packet.lapDataList) {
                 this.lapData = packet.lapDataList[playerCarIndex];
             } else if (packet.header.packetId === 1) {

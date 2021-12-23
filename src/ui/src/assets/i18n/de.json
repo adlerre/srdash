@@ -1,12 +1,30 @@
 {
     "dashboard": {
-        "engine": {
-            "label": "Motor",
-            "short": "Eng"
+        "legend": {
+            "bestLapTime": "Sch. Rundenzeit",
+            "breakBias": "BBal",
+            "breakTemp": "TB",
+            "currentLapTime": "Rundenzeit",
+            "differential": "Diff",
+            "drs": "DRS",
+            "engine": "Motor",
+            "ers": "ERS",
+            "fuelMix": "Mix",
+            "fuelMass": "TMasse",
+            "fuelRemaining": "TÜber",
+            "gear": "Gang",
+            "lap": "Runde",
+            "position": "Pos",
+            "rpm": "RPM",
+            "speed": "Speed",
+            "tyreTemp": "TR"
         },
-        "fuelMass": "{mass} kg",
-        "lap": "R{lap}",
-        "position": "P{position}"
+        "wheel": {
+            "frontLeft": "VL",
+            "frontRight": "VR",
+            "rearLeft": "HL",
+            "rearRight": "HR"
+        }
     },
     "modal": {
         "system": {

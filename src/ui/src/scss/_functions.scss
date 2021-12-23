@@ -1,0 +1,9 @@
+@function color-yiq($color, $dark: #000, $light: #FFF) {
+    $r: red($color);
+    $g: green($color);
+    $b: blue($color);
+
+    $yiq: calc((($r * 299) + ($g * 587) + ($b * 114)) / 1000);
+    
+    @return if($yiq >= 90, $dark, $light); 
+}
