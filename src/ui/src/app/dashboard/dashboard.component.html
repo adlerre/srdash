@@ -63,27 +63,27 @@
 
         <div>
             <div class="d-flex">
-                <fieldset class="flex-fill border-info">
+                <fieldset class="flex-shrink-2 flex-grow-1 border-info">
                     <legend>{{ 'dashboard.legend.breakBias' | translate }}</legend>
                     <span class="fs-2">{{ carStatusData?.frontBrakeBias || '--' }}</span>
                 </fieldset>
 
-                <fieldset class="flex-fill border-success">
+                <fieldset class="flex-shrink-2 flex-grow-1 border-success">
                     <legend>{{ 'dashboard.legend.differential' | translate }}</legend>
                     <span class="fs-2">{{ carSetupData?.onThrottle || '--' }}</span>
                 </fieldset>
 
-                <fieldset class="border-lightblue flex-fill">
+                <fieldset class="flex-shrink-0 flex-grow-2 border-lightblue">
                     <legend>{{ 'dashboard.legend.rpm' | translate }}</legend>
                     <span class="fs-2">{{ carTelemetryData?.engineRpm || 0 }}</span>
                 </fieldset>
 
-                <fieldset class="border-purple flex-fill">
+                <fieldset class="flex-shrink-0 flex-grow-1 border-purple">
                     <legend>{{ 'dashboard.legend.speed' | translate }}</legend>
                     <span class="fs-2">{{ carTelemetryData?.speed || 0 }}</span>
                 </fieldset>
 
-                <fieldset class="flex-fill p-0 pt-1 d-flex">
+                <fieldset class="d-flex flex-shrink-0 flex-grow-1 p-0 pt-1">
                     <legend>{{ 'dashboard.legend.engine' | translate }}</legend>
                     <div class="d-inline-flex flex-column flex-fill justify-content-center"
                         [ngClass]="{'bg-success': carTelemetryData?.engineTemperature < 135, 'bg-danger': carTelemetryData?.engineTemperature >= 135}">
@@ -113,8 +113,7 @@
                                     <div class="d-inline-flex flex-column flex-fill justify-content-center"
                                         [ngClass]="{'bg-success': carTelemetryData?.tyreInnerTemperature[type] >= compoundInfo?.temperature[0] && carTelemetryData?.tyreInnerTemperature[type] <= compoundInfo?.temperature[1], 'bg-danger': carTelemetryData?.tyreInnerTemperature[type] > compoundInfo?.temperature[1], 'bg-warning': carTelemetryData?.tyreInnerTemperature[type] < compoundInfo?.temperature[0]}">
                                         <div class="fs-3 degree">
-                                            {{ carTelemetryData?.tyreInnerTemperature[type] || '--' }}
-                                        </div>
+                                            {{ carTelemetryData?.tyreInnerTemperature[type] || '--' }}</div>
                                         <div class="fs-5">{{ getTyreDamage(type) || 0 }}%</div>
                                     </div>
                                 </fieldset>
@@ -152,8 +151,8 @@
                                         {{ 'dashboard.wheel.' + type | translate }}</legend>
                                     <div class="d-inline-flex flex-column flex-fill justify-content-center"
                                         [ngClass]="{'bg-success': carTelemetryData?.brakeTemperature[type] <= 700, 'bg-warning': carTelemetryData?.brakeTemperature[type] > 700 && carTelemetryData?.brakeTemperature[type] < 900, 'bg-danger': carTelemetryData?.brakeTemperature[type] >= 900}">
-                                        <div class="fs-3 degree">{{ carTelemetryData?.brakeTemperature[type] || '--' }}
-                                        </div>
+                                        <div class="fs-3 degree">
+                                            {{ carTelemetryData?.brakeTemperature[type] || '--' }}</div>
                                         <div class="fs-5">{{ carDamageData?.brakesDamage[type] || 0 }}%</div>
                                     </div>
                                 </fieldset>
@@ -212,28 +211,29 @@
             </div>
 
             <div class="d-flex">
-                <fieldset class="flex-fill d-flex p-0 pt-1">
+                <fieldset class="d-flex flex-shrink-2 flex-grow-1 p-0 pt-1">
                     <legend>{{ 'dashboard.legend.lap' | translate }}</legend>
                     <div class="d-inline-flex flex-fill justify-content-center bg-silver">
-                        <span class="fs-2">{{ min(lapData?.currentLapNum, sessionData?.totalLaps) || '--' }}{{ sessionData?.totalLaps && sessionData?.totalLaps > 1 && sessionData?.totalLaps < 200 ? ' / ' + sessionData?.totalLaps : '' }}</span>
+                        <span
+                            class="fs-2">{{ min(lapData?.currentLapNum, sessionData?.totalLaps) || '--' }}{{ sessionData?.totalLaps && sessionData?.totalLaps > 1 && sessionData?.totalLaps < 200 ? ' / ' + sessionData?.totalLaps : '' }}</span>
                     </div>
                 </fieldset>
 
-                <fieldset class="flex-fill d-flex p-0 pt-1">
+                <fieldset class="d-flex flex-shrink-2 flex-grow-1 p-0 pt-1">
                     <legend>{{ 'dashboard.legend.position' | translate }}</legend>
                     <div class="d-inline-flex flex-fill justify-content-center bg-silver">
                         <span class="fs-2">{{ lapData?.carPosition || '--' }}</span>
                     </div>
                 </fieldset>
 
-                <fieldset class="flex-fill d-flex p-0 pt-1">
+                <fieldset class="d-flex flex-shrink-2 flex-grow-1 p-0 pt-1">
                     <legend>{{ 'dashboard.legend.fuelMix' | translate }}</legend>
                     <div class="d-inline-flex flex-fill justify-content-center bg-silver">
                         <span class="fs-2">{{ carStatusData?.fuelMix + 1 || 0 }}</span>
                     </div>
                 </fieldset>
 
-                <fieldset class="flex-fill d-flex p-0 pt-1 border-orange">
+                <fieldset class="d-flex flex-grow-1 p-0 pt-1 border-orange">
                     <legend>{{ 'dashboard.legend.fuelMass' | translate }}</legend>
                     <div class="d-inline-flex flex-fill justify-content-center bg-orange">
                         <span class="fs-2">{{ (carStatusData?.fuelInTank || 0) | number: '1.1-1' }}</span>
@@ -241,7 +241,7 @@
                 </fieldset>
 
                 <ng-template #fuelReserve let-reserve="reserve">
-                    <fieldset class="flex-fill p-0 pt-1 d-flex"
+                    <fieldset class="d-flex flex-grow-1 p-0 pt-1"
                         [ngClass]="{'border-success': reserve > 0, 'border-danger': reserve < 0}">
                         <legend>{{ 'dashboard.legend.fuelRemaining' | translate }}</legend>
 

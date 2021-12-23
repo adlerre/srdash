@@ -1,3 +1,6 @@
+$flex-size-type: (grow, shrink);
+$flex-sizes: (0, 1, 2, 3, 4);
+
 $flexAlignTypes: (
     "align-content": (
         start: flex-start,
@@ -50,6 +53,14 @@ $flexAlignTypes: (
         }
     };
 };
+
+@each $type in $flex-size-type {
+    @each $size in $flex-sizes {
+        .flex-#{$type}-#{$size} {
+            flex-#{$type}: $size!important;
+        }
+    }
+}
 
 .flex-fill {
     flex: 1 1 auto!important;
