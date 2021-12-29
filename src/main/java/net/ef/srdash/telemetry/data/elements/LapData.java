@@ -7,6 +7,16 @@ public class LapData {
     private float lastLapTime;
     private float currentLapTime;
     private float bestLapTime;
+    private int bestLapNum;
+    private int bestLapSector1TimeInMS;
+    private int bestLapSector2TimeInMS;
+    private int bestLapSector3TimeInMS;
+    private int bestOverallSector1TimeInMS;
+    private int bestOverallSector1LapNum;
+    private int bestOverallSector2TimeInMS;
+    private int bestOverallSector2LapNum;
+    private int bestOverallSector3TimeInMS;
+    private int bestOverallSector3LapNum;
     private float sector1Time;
     private float sector2Time;
     private float lapDistance;
@@ -71,6 +81,146 @@ public class LapData {
 
     public void setBestLapTime(float bestLapTime) {
         this.bestLapTime = bestLapTime;
+    }
+
+    /**
+     * @return the bestLapNum
+     */
+    public int getBestLapNum() {
+        return bestLapNum;
+    }
+
+    /**
+     * @param bestLapNum the bestLapNum to set
+     */
+    public void setBestLapNum(int bestLapNum) {
+        this.bestLapNum = bestLapNum;
+    }
+
+    /**
+     * @return the bestLapSector1TimeInMS
+     */
+    public int getBestLapSector1TimeInMS() {
+        return bestLapSector1TimeInMS;
+    }
+
+    /**
+     * @param bestLapSector1TimeInMS the bestLapSector1TimeInMS to set
+     */
+    public void setBestLapSector1TimeInMS(int bestLapSector1TimeInMS) {
+        this.bestLapSector1TimeInMS = bestLapSector1TimeInMS;
+    }
+
+    /**
+     * @return the bestLapSector2TimeInMS
+     */
+    public int getBestLapSector2TimeInMS() {
+        return bestLapSector2TimeInMS;
+    }
+
+    /**
+     * @param bestLapSector2TimeInMS the bestLapSector2TimeInMS to set
+     */
+    public void setBestLapSector2TimeInMS(int bestLapSector2TimeInMS) {
+        this.bestLapSector2TimeInMS = bestLapSector2TimeInMS;
+    }
+
+    /**
+     * @return the bestLapSector3TimeInMS
+     */
+    public int getBestLapSector3TimeInMS() {
+        return bestLapSector3TimeInMS;
+    }
+
+    /**
+     * @param bestLapSector3TimeInMS the bestLapSector3TimeInMS to set
+     */
+    public void setBestLapSector3TimeInMS(int bestLapSector3TimeInMS) {
+        this.bestLapSector3TimeInMS = bestLapSector3TimeInMS;
+    }
+
+    /**
+     * @return the bestOverallSector1TimeInMS
+     */
+    public int getBestOverallSector1TimeInMS() {
+        return bestOverallSector1TimeInMS;
+    }
+
+    /**
+     * @param bestOverallSector1TimeInMS the bestOverallSector1TimeInMS to set
+     */
+    public void setBestOverallSector1TimeInMS(int bestOverallSector1TimeInMS) {
+        this.bestOverallSector1TimeInMS = bestOverallSector1TimeInMS;
+    }
+
+    /**
+     * @return the bestOverallSector1LapNum
+     */
+    public int getBestOverallSector1LapNum() {
+        return bestOverallSector1LapNum;
+    }
+
+    /**
+     * @param bestOverallSector1LapNum the bestOverallSector1LapNum to set
+     */
+    public void setBestOverallSector1LapNum(int bestOverallSector1LapNum) {
+        this.bestOverallSector1LapNum = bestOverallSector1LapNum;
+    }
+
+    /**
+     * @return the bestOverallSector2TimeInMS
+     */
+    public int getBestOverallSector2TimeInMS() {
+        return bestOverallSector2TimeInMS;
+    }
+
+    /**
+     * @param bestOverallSector2TimeInMS the bestOverallSector2TimeInMS to set
+     */
+    public void setBestOverallSector2TimeInMS(int bestOverallSector2TimeInMS) {
+        this.bestOverallSector2TimeInMS = bestOverallSector2TimeInMS;
+    }
+
+    /**
+     * @return the bestOverallSector2LapNum
+     */
+    public int getBestOverallSector2LapNum() {
+        return bestOverallSector2LapNum;
+    }
+
+    /**
+     * @param bestOverallSector2LapNum the bestOverallSector2LapNum to set
+     */
+    public void setBestOverallSector2LapNum(int bestOverallSector2LapNum) {
+        this.bestOverallSector2LapNum = bestOverallSector2LapNum;
+    }
+
+    /**
+     * @return the bestOverallSector3TimeInMS
+     */
+    public int getBestOverallSector3TimeInMS() {
+        return bestOverallSector3TimeInMS;
+    }
+
+    /**
+     * @param bestOverallSector3TimeInMS the bestOverallSector3TimeInMS to set
+     */
+    public void setBestOverallSector3TimeInMS(int bestOverallSector3TimeInMS) {
+        this.bestOverallSector3TimeInMS = bestOverallSector3TimeInMS;
+    }
+
+    /**
+     * @return the bestOverallSector3LapNum
+     */
+    public int getBestOverallSector3LapNum() {
+        return bestOverallSector3LapNum;
+    }
+
+    /**
+     * @param bestOverallSector3LapNum the bestOverallSector3LapNum to set
+     */
+    public void setBestOverallSector3LapNum(int bestOverallSector3LapNum) {
+        this.bestOverallSector3LapNum = bestOverallSector3LapNum;
     }
 
     public float getSector1Time() {

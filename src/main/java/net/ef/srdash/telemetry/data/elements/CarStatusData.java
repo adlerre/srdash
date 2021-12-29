@@ -42,6 +42,8 @@ public class CarStatusData {
 
     private int rearWingDamage;
 
+    private int drsFault;
+
     private int engineDamage;
 
     private int gearBoxDamage;
@@ -251,6 +253,20 @@ public class CarStatusData {
         this.rearWingDamage = rearWingDamage;
     }
 
+    /**
+     * @return the drsFault
+     */
+    public int getDrsFault() {
+        return drsFault;
+    }
+
+    /**
+     * @param drsFault the drsFault to set
+     */
+    public void setDrsFault(int drsFault) {
+        this.drsFault = drsFault;
+    }
+
     public int getEngineDamage() {
         return engineDamage;
     }
@@ -277,7 +293,7 @@ public class CarStatusData {
 
     /**
      * @return the tyresAgeLaps
-     * @since 2021
+     * @since 2020
      */
     public int getTyresAgeLaps() {
         return tyresAgeLaps;
@@ -285,7 +301,7 @@ public class CarStatusData {
 
     /**
      * @param tyresAgeLaps the tyresAgeLaps to set
-     * @since 2021
+     * @since 2020
      */
     public void setTyresAgeLaps(int tyresAgeLaps) {
         this.tyresAgeLaps = tyresAgeLaps;

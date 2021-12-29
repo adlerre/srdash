@@ -49,6 +49,8 @@ import net.ef.srdash.telemetry.data.elements.ZoneFlag;
  * 
  * @see https://forums.codemasters.com/discussion/136948/f1-2018-udp-specification
  * @see https://f1-2019-telemetry.readthedocs.io/en/latest/telemetry-specification.html
+ * @see https://forums.codemasters.com/topic/50942-f1-2020-udp-specification/
+ * @see https://github.com/raweceek-temeletry/f1-2021-udp
  *
  */
 public class PacketDeserializer {
@@ -197,7 +199,7 @@ public class PacketDeserializer {
         header.setSessionTime(buffer.getNextFloat());// 4
         header.setFrameIdentifier(buffer.getNextUIntAsLong());// 4
         header.setPlayerCarIndex(buffer.getNextUInt8AsInt()); // 1
-        if (version >= F1_2021) {
+        if (version >= F1_2020) {
             header.setSecondaryPlayerCarIndex(buffer.getNextUInt8AsInt()); // 1
         }
 
@@ -261,7 +263,24 @@ public class PacketDeserializer {
     	    float       m_sector1Time;                 // Sector 1 time in seconds
     	    float       m_sector2Time;                 // Sector 2 time in seconds
     	    
-    	    // >= F1 2020 ?
+    	    // == F1 2020
+    	    float    m_lastLapTime;                    // Last lap time in seconds
+            float    m_currentLapTime;                 // Current time around the lap in seconds
+            uint16   m_sector1TimeInMS;                // Sector 1 time in milliseconds
+            uint16   m_sector2TimeInMS;                // Sector 2 time in milliseconds
+            float    m_bestLapTime;                    // Best lap time of the session in seconds
+            uint8    m_bestLapNum;                     // Lap number best time achieved on
+            uint16   m_bestLapSector1TimeInMS;         // Sector 1 time of best lap in the session in milliseconds
+            uint16   m_bestLapSector2TimeInMS;         // Sector 2 time of best lap in the session in milliseconds
+            uint16   m_bestLapSector3TimeInMS;         // Sector 3 time of best lap in the session in milliseconds
+            uint16   m_bestOverallSector1TimeInMS;     // Best overall sector 1 time of the session in milliseconds
+            uint8    m_bestOverallSector1LapNum;       // Lap number best overall sector 1 time achieved on
+            uint16   m_bestOverallSector2TimeInMS;     // Best overall sector 2 time of the session in milliseconds
+            uint8    m_bestOverallSector2LapNum;       // Lap number best overall sector 2 time achieved on
+            uint16   m_bestOverallSector3TimeInMS;     // Best overall sector 3 time of the session in milliseconds
+            uint8    m_bestOverallSector3LapNum;       // Lap number best overall sector 3 time achieved on
+    	    
+    	    // >= F1 2021
     	    uint32      m_lastLapTimeInMS;             // Last lap time in milliseconds
             uint32      m_currentLapTimeInMS;          // Current time around the lap in milliseconds
             uint16      m_sector1TimeInMS;             // Sector 1 time in milliseconds
@@ -317,6 +336,22 @@ public class PacketDeserializer {
             lapData.setSector1Time(buffer.getNextFloat());
             lapData.setSector2Time(buffer.getNextFloat());
         } else if (version >= F1_2020) {
+            lapData.setLastLapTime(buffer.getNextFloat());
+            lapData.setCurrentLapTime(buffer.getNextFloat());
+            lapData.setSector1Time(msToSeconds(buffer.getNextUInt16AsInt()));
+            lapData.setSector2Time(msToSeconds(buffer.getNextUInt16AsInt()));
+            lapData.setBestLapTime(buffer.getNextFloat());
+            lapData.setBestLapNum(buffer.getNextUInt8AsInt());
+            lapData.setBestLapSector1TimeInMS(buffer.getNextUInt16AsInt());
+            lapData.setBestLapSector2TimeInMS(buffer.getNextUInt16AsInt());
+            lapData.setBestLapSector3TimeInMS(buffer.getNextUInt16AsInt());
+            lapData.setBestOverallSector1LapNum(buffer.getNextUInt16AsInt());
+            lapData.setBestOverallSector1LapNum(buffer.getNextUInt8AsInt());
+            lapData.setBestOverallSector2LapNum(buffer.getNextUInt16AsInt());
+            lapData.setBestOverallSector2LapNum(buffer.getNextUInt8AsInt());
+            lapData.setBestOverallSector3LapNum(buffer.getNextUInt16AsInt());
+            lapData.setBestOverallSector3LapNum(buffer.getNextUInt8AsInt());
+        } else if (version >= F1_2021) {
             lapData.setLastLapTime(msToSeconds(buffer.getNextUIntAsLong()));
             lapData.setCurrentLapTime(msToSeconds(buffer.getNextUIntAsLong()));
             lapData.setSector1Time(msToSeconds(buffer.getNextUInt16AsInt()));
@@ -328,13 +363,13 @@ public class PacketDeserializer {
         lapData.setCarPosition(buffer.getNextUInt8AsInt());
         lapData.setCurrentLapNum(buffer.getNextUInt8AsInt());
         lapData.setPitStatus(PitStatus.fromInt(buffer.getNextUInt8AsInt()));
-        if (version >= F1_2020) {
+        if (version >= F1_2021) {
             lapData.setNumPitStops(buffer.getNextUInt8AsInt());
         }
         lapData.setSector(buffer.getNextUInt8AsInt() + 1);
         lapData.setCurrentLapInvalid(buffer.getNextUInt8AsInt() == 1);
         lapData.setPenalties(buffer.getNextUInt8AsInt());
-        if (version >= F1_2020) {
+        if (version >= F1_2021) {
             lapData.setWarnings(buffer.getNextUInt8AsInt());
             lapData.setNumUnservedDriveThroughPens(buffer.getNextUInt8AsInt());
             lapData.setNumUnservedStopGoPens(buffer.getNextUInt8AsInt());
@@ -342,7 +377,7 @@ public class PacketDeserializer {
         lapData.setGridPosition(buffer.getNextUInt8AsInt());
         lapData.setDriverStatus(DriverStatus.fromInt(buffer.getNextUInt8AsInt()));
         lapData.setResultStatus(ResultStatus.fromInt(buffer.getNextUInt8AsInt()));
-        if (version >= F1_2020) {
+        if (version >= F1_2021) {
             lapData.setPitLaneTimerActive(buffer.getNextUInt8AsInt() == 1);
             lapData.setPitLaneTimeInLane(msToSeconds(buffer.getNextUInt16AsInt()));
             lapData.setPitStopTimer(msToSeconds(buffer.getNextUInt16AsInt()));
@@ -578,23 +613,25 @@ public class PacketDeserializer {
         if (version >= F1_2020) {
             sessionData.setNumWeatherForecastSamples(buffer.getNextInt8AsInt());
             sessionData.setWeatherForecast(buildWeatherForecasts(sessionData.getNumWeatherForecastSamples()));
-            sessionData.setForecastAccuracy(buffer.getNextUInt8AsInt());
-            sessionData.setAiDifficulty(buffer.getNextUInt8AsInt());
-            sessionData.setSeasonLinkIdentifier(buffer.getNextUIntAsLong());
-            sessionData.setWeekendLinkIdentifier(buffer.getNextUIntAsLong());
-            sessionData.setSessionLinkIdentifier(buffer.getNextUIntAsLong());
-            sessionData.setPitStopWindowIdealLap(buffer.getNextUInt8AsInt());
-            sessionData.setPitStopWindowLatestLap(buffer.getNextUInt8AsInt());
-            sessionData.setPitStopRejoinPosition(buffer.getNextUInt8AsInt());
-            sessionData.setSteeringAssist(buffer.getNextUInt8AsBoolean());
-            sessionData.setBrakingAssist(buffer.getNextUInt8AsBoolean());
-            sessionData.setGearboxAssist(buffer.getNextUInt8AsBoolean());
-            sessionData.setPitAssist(buffer.getNextUInt8AsBoolean());
-            sessionData.setPitReleaseAssist(buffer.getNextUInt8AsBoolean());
-            sessionData.setERSAssist(buffer.getNextUInt8AsBoolean());
-            sessionData.setDRSAssist(buffer.getNextUInt8AsBoolean());
-            sessionData.setDynamicRacingLine(buffer.getNextUInt8AsInt());
-            sessionData.setDynamicRacingLineType(buffer.getNextUInt8AsInt());
+            if (version >= F1_2021) {
+                sessionData.setForecastAccuracy(buffer.getNextUInt8AsInt());
+                sessionData.setAiDifficulty(buffer.getNextUInt8AsInt());
+                sessionData.setSeasonLinkIdentifier(buffer.getNextUIntAsLong());
+                sessionData.setWeekendLinkIdentifier(buffer.getNextUIntAsLong());
+                sessionData.setSessionLinkIdentifier(buffer.getNextUIntAsLong());
+                sessionData.setPitStopWindowIdealLap(buffer.getNextUInt8AsInt());
+                sessionData.setPitStopWindowLatestLap(buffer.getNextUInt8AsInt());
+                sessionData.setPitStopRejoinPosition(buffer.getNextUInt8AsInt());
+                sessionData.setSteeringAssist(buffer.getNextUInt8AsBoolean());
+                sessionData.setBrakingAssist(buffer.getNextUInt8AsBoolean());
+                sessionData.setGearboxAssist(buffer.getNextUInt8AsBoolean());
+                sessionData.setPitAssist(buffer.getNextUInt8AsBoolean());
+                sessionData.setPitReleaseAssist(buffer.getNextUInt8AsBoolean());
+                sessionData.setERSAssist(buffer.getNextUInt8AsBoolean());
+                sessionData.setDRSAssist(buffer.getNextUInt8AsBoolean());
+                sessionData.setDynamicRacingLine(buffer.getNextUInt8AsInt());
+                sessionData.setDynamicRacingLineType(buffer.getNextUInt8AsInt());
+            }
         }
 
         return sessionData;
@@ -653,10 +690,14 @@ public class PacketDeserializer {
             weatherForecast.setTimeOffset(buffer.getNextUInt8AsInt());
             weatherForecast.setWeather(buffer.getNextUInt8AsInt());
             weatherForecast.setTrackTemperature(buffer.getNextInt8AsInt());
-            weatherForecast.setTrackTemperatureChange(buffer.getNextInt8AsInt());
+            if (version >= F1_2021) {
+                weatherForecast.setTrackTemperatureChange(buffer.getNextInt8AsInt());
+            }
             weatherForecast.setAirTemperature(buffer.getNextInt8AsInt());
-            weatherForecast.setAirTemperatureChange(buffer.getNextInt8AsInt());
-            weatherForecast.setRainPercentage(buffer.getNextUInt8AsInt());
+            if (version >= F1_2021) {
+                weatherForecast.setAirTemperatureChange(buffer.getNextInt8AsInt());
+                weatherForecast.setRainPercentage(buffer.getNextUInt8AsInt());
+            }
         }
         return weatherForecasts;
     }
@@ -767,11 +808,11 @@ public class PacketDeserializer {
 
         participant.setAiControlled(buffer.getNextUInt8AsBoolean());
         participant.setDriverId(buffer.getNextUInt8AsInt());
-        if (version >= F1_2019) {
+        if (version >= F1_2021) {
             participant.setNetworkId(buffer.getNextUInt8AsInt());
         }
         participant.setTeamId(buffer.getNextUInt8AsInt());
-        if (version >= F1_2019) {
+        if (version >= F1_2021) {
             participant.setMyTeam(buffer.getNextUInt8AsInt());
         }
         participant.setRaceNumber(buffer.getNextUInt8AsInt());
@@ -883,7 +924,7 @@ public class PacketDeserializer {
         if (version <= F1_2019) {
             setupData.setFrontTyrePressure(buffer.getNextFloat()); // 47
             setupData.setRearTyrePressure(buffer.getNextFloat()); // 55
-        } else if (version > F1_2019) {
+        } else if (version >= F1_2020) {
             setupData.setRearLeftTyrePressure(buffer.getNextFloat());
             setupData.setRearRightTyrePressure(buffer.getNextFloat());
             setupData.setFrontLeftTyrePressure(buffer.getNextFloat());
@@ -940,10 +981,10 @@ public class PacketDeserializer {
         for (int k = 0; k < numberOfCars(); k++) {
             carsTelemetry.add(buildCarTelemetryData());
         }
-        if (version <= F1_2019) {
+        if (version <= F1_2020) {
             packetCarTelemetry.setButtonStatus(buildButtonStatus());
         }
-        if (version > F1_2019) {
+        if (version >= F1_2020) {
             packetCarTelemetry.setMfdPanelIndex(buffer.getNextUInt8AsInt());
             packetCarTelemetry.setMfdPanelIndexSecondaryPlayer(buffer.getNextUInt8AsInt());
             packetCarTelemetry.setSuggestedGear(buffer.getNextInt8AsInt());
@@ -1007,7 +1048,7 @@ public class PacketDeserializer {
         if (version <= F1_2019) {
             carTelemetry.setTyreSurfaceTemperature(new WheelData<Integer>(buffer.getNextUInt16ArrayAsIntegerArray(4)));
             carTelemetry.setTyreInnerTemperature(new WheelData<Integer>(buffer.getNextUInt16ArrayAsIntegerArray(4)));
-        } else if (version >= F1_2021) {
+        } else if (version >= F1_2020) {
             carTelemetry.setTyreSurfaceTemperature(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
             carTelemetry.setTyreInnerTemperature(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
         }
@@ -1178,25 +1219,33 @@ public class PacketDeserializer {
         if (version >= F1_2020) {
             carStatus.setDrsActivationDistance(buffer.getNextUInt16AsInt());
         }
-        if (version <= F1_2019) {
+        if (version <= F1_2020) {
             carStatus.setTyresWear(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
         }
         carStatus.setTyreCompound(buffer.getNextUInt8AsInt());
         if (version >= F1_2019) {
             carStatus.setTyreVisualCompound(buffer.getNextUInt8AsInt());
         }
-        if (version <= F1_2019) {
+        if (version <= F1_2020) {
+            if (version == F1_2020) {
+                carStatus.setTyresAgeLaps(buffer.getNextUInt8AsInt());
+            }
             carStatus.setTyresDamage(new WheelData<Integer>(buffer.getNextUInt8ArrayAsIntegerArray(4)));
             carStatus.setFrontLeftWingDamage(buffer.getNextUInt8AsInt());
             carStatus.setFrontRightWingDamage(buffer.getNextUInt8AsInt());
             carStatus.setRearWingDamage(buffer.getNextUInt8AsInt());
+            if (version == F1_2020) {
+                carStatus.setDrsFault(buffer.getNextUInt8AsInt());
+            }
             carStatus.setEngineDamage(buffer.getNextUInt8AsInt());
             carStatus.setGearBoxDamage(buffer.getNextUInt8AsInt());
             if (version == F1_2018) {
                 carStatus.setExhaustDamage(buffer.getNextUInt8AsInt());
             }
         }
-        carStatus.setTyresAgeLaps(buffer.getNextUInt8AsInt());
+        if (version >= F1_2021) {
+            carStatus.setTyresAgeLaps(buffer.getNextUInt8AsInt());
+        }
         carStatus.setVehicleFiaFlags(buffer.getNextInt8AsInt());
         carStatus.setErsStoreEngery(buffer.getNextFloat());
         carStatus.setErsDeployMode(buffer.getNextUInt8AsInt());
@@ -1204,7 +1253,7 @@ public class PacketDeserializer {
         carStatus.setErsHarvestedThisLapMGUH(buffer.getNextFloat());
         carStatus.setErsDeployedThisLap(buffer.getNextFloat());
 
-        if (version >= F1_2020) {
+        if (version >= F1_2021) {
             carStatus.setNetworkPaused(buffer.getNextUInt8AsInt());
         }
 
