@@ -335,7 +335,7 @@ public class PacketDeserializer {
             lapData.setBestLapTime(buffer.getNextFloat());
             lapData.setSector1Time(buffer.getNextFloat());
             lapData.setSector2Time(buffer.getNextFloat());
-        } else if (version >= F1_2020) {
+        } else if (version == F1_2020) {
             lapData.setLastLapTime(buffer.getNextFloat());
             lapData.setCurrentLapTime(buffer.getNextFloat());
             lapData.setSector1Time(msToSeconds(buffer.getNextUInt16AsInt()));
