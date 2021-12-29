@@ -252,7 +252,7 @@
                         <div class="d-inline-flex flex-fill justify-content-center"
                             [ngClass]="{'bg-success': reserve > 0, 'bg-danger': reserve < 0, 'bg-silver': reserve === 0}">
                             <span
-                                class="fs-2">{{ (reserve > 0 ? '+' : reserve < 0 ? '-' : '') + (reserve | number: '1.1-1') }}</span>
+                                class="fs-2">{{ (reserve > 0 ? '+' : '') + (reserve | number: '1.2-2') }}</span>
                         </div>
                     </fieldset>
                 </ng-template>
