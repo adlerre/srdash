@@ -82,7 +82,6 @@
             "projectType": "application"
         }
     },
-    "defaultProject": "srdash-ui",
     "schematics": {
         "@schematics/angular:component": {
             "prefix": "app",
