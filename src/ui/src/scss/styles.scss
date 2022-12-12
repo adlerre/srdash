@@ -16,15 +16,15 @@
 /*
  * FontAwesome
  */
-$fa-font-path: "../../../../node_modules/@fortawesome/fontawesome-free/webfonts/";
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts/";
 
-@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
-//@import "~@fortawesome/fontawesome-free/scss/brands.scss";
-@import "~@fortawesome/fontawesome-free/scss/solid.scss";
-@import "~@fortawesome/fontawesome-free/scss/regular.scss";
+@import "@fortawesome/fontawesome-free/scss/fontawesome.scss";
+//@import "@fortawesome/fontawesome-free/scss/brands.scss";
+@import "@fortawesome/fontawesome-free/scss/solid.scss";
+@import "@fortawesome/fontawesome-free/scss/regular.scss";
 
-@import "~@fontsource/dseg14/index.css";
-@import "~@fontsource/dseg14/700.css";
+@import "@fontsource/dseg14/index.css";
+@import "@fontsource/dseg14/700.css";
 
 html, body {
     margin: 0;

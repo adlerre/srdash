@@ -16,6 +16,11 @@
 .project
 .settings/
 target/
+/node_modules/
+/package-lock.json
+/pom.xml.bak
+/.idea/
+/srdash.iml
 
 # Package Files #
 *.jar
@@ -28,6 +33,3 @@ target/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-/node_modules/
-/package-lock.json
-/pom.xml.bak
