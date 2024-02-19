@@ -23,13 +23,13 @@
     <properties>
         <eclipselink.version>3.0.3</eclipselink.version>
         <encoding>UTF-8</encoding>
-        <grizzly.version>4.0.0</grizzly.version>
+        <grizzly.version>4.0.2</grizzly.version>
         <java.version>11</java.version>
-        <jersey.version>3.1.0</jersey.version>
-        <log4j.version>2.19.0</log4j.version>
+        <jersey.version>3.1.5</jersey.version>
+        <log4j.version>2.20.0</log4j.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <node.version>v18.10.0</node.version>
-        <npm.version>8.19.2</npm.version>
+        <node.version>v18.16.0</node.version>
+        <npm.version>9.2.0</npm.version>
     </properties>
     <dependencies>
         <dependency>
@@ -51,6 +51,11 @@
         <dependency>
             <groupId>org.glassfish.grizzly</groupId>
             <artifactId>grizzly-http</artifactId>
+            <version>${grizzly.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.grizzly</groupId>
+            <artifactId>grizzly-framework</artifactId>
             <version>${grizzly.version}</version>
         </dependency>
         <dependency>
@@ -134,7 +139,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.1-jre</version>
+            <version>33.0.0-jre</version>
         </dependency>
 
         <dependency>
@@ -146,7 +151,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
+            <version>2.15.1</version>
         </dependency>
 
         <dependency>
@@ -158,7 +163,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.14.1</version>
+            <version>2.16.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -168,15 +173,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-            <version>3.0.2</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>3.0.2</version>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.4</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -210,13 +209,13 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.3.0</version>
                     <dependencies>
                         <!-- new version to support Java 11 -->
                         <dependency>
                             <groupId>org.apache.maven.shared</groupId>
                             <artifactId>maven-dependency-analyzer</artifactId>
-                            <version>1.11.3</version>
+                            <version>1.13.2</version>
                             <exclusions>
                                 <exclusion>
                                     <groupId>org.apache.maven</groupId>
@@ -254,7 +253,7 @@
                         </bundledSignatures>
                     </configuration>
                 </plugin>
-                <!--This plugin's configuration is used to store Eclipse m2e settings 
+                <!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
