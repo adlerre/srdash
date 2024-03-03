@@ -1,5 +1,8 @@
 {
     "dashboard": {
+        "external": {
+            "noUrlConfigured": "Keine externe Dashboard URL konfiguriert!"
+        },
         "legend": {
             "bestLapTime": "Sch. Rundenzeit",
             "breakBias": "BBal",

@@ -1,0 +1,7 @@
+<div id="external-dashboard" class="screen-center">
+    @if (getDashbaordUrl()) {
+        <iframe [src]="getDashbaordUrl()" allowfullscreen></iframe>
+    } @else {
+        <div class="alert alert-waring">{{ 'dashboard.external.noUrlConfigured' | translate }}</div>
+    }
+</div>

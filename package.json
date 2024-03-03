@@ -37,6 +37,7 @@
     "@uirouter/angular": "13.0.0",
     "@uirouter/core": "6.1.0",
     "@uirouter/rx": "1.0.0",
+    "hammerjs": "^2.0.8",
     "messageformat": "^2.3.0",
     "ngx-translate-messageformat-compiler": "^7.0.0",
     "rxjs": "^7.8.1",

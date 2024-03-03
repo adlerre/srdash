@@ -1,5 +1,8 @@
 {
     "dashboard": {
+        "external": {
+            "noUrlConfigured": "No external dashboard URl configured!"
+        },
         "legend": {
             "bestLapTime": "Best Laptime",
             "breakBias": "BBias",
