@@ -28,7 +28,7 @@ import java.util.Properties;
  * <p>
  * // possible use case<br>
  * AppProperties p = Configuration.instance().getProperties();<br>
- * AppPropertiesResolver r = new MCRPropertiesResolver(p);<br>
+ * AppPropertiesResolver r = new AppPropertiesResolver(p);<br>
  * AppProperties resolvedProperties = r.resolveAll(p);<br>
  * </p>
  * 

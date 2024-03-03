@@ -16,104 +16,103 @@
  */
 package net.ef.srdash.common.config;
 
+import org.apache.logging.log4j.LogManager;
+
 import java.util.Map;
 import java.util.Properties;
-
-import org.apache.logging.log4j.LogManager;
 
 /**
  * Like {@link Properties} but with in-place replacement of properties that want
  * to append a value.
- * 
+ * <p>
  * Properties for System.getProperties() have always precedence for Properties
  * defined here.
- * 
+ *
  * <pre>
  * key=value1
  * key=%key%,value2
  * </pre>
- * 
+ * <p>
  * will be resolved to
- * 
+ *
  * <pre>
  * key=value1,value2
  * </pre>
- * 
+ *
  * @author Ren\u00E9 Adler (eagle)
  */
 public class AppProperties extends Properties {
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -6572230923593865161L;
+    /**
+     * The Constant serialVersionUID.
+     */
+    private static final long serialVersionUID = -6572230923593865161L;
 
-	/* (non-Javadoc)
-	 * @see java.util.Hashtable#put(java.lang.Object, java.lang.Object)
-	 */
-	@Override
-	public synchronized Object put(Object key, Object value) {
-		return putString((String) key, (String) value);
-	}
+    /* (non-Javadoc)
+     * @see java.util.Hashtable#put(java.lang.Object, java.lang.Object)
+     */
+    @Override
+    public synchronized Object put(Object key, Object value) {
+        return putString((String) key, (String) value);
+    }
 
-	/**
-	 * Put string.
-	 *
-	 * @param key
-	 *            the key
-	 * @param value
-	 *            the value
-	 * @return the object
-	 */
-	private Object putString(String key, String value) {
-		String systemProperty = System.getProperties().getProperty(key);
-		if (systemProperty != null && !systemProperty.equals(value)) {
-			LogManager.getLogger(getClass()).error("Cannot overwrite system property: " + key + "=" + value);
-			return systemProperty;
-		}
-		String oldValue = (String) super.get(key);
-		String newValue = oldValue == null ? value : value.replaceAll('%' + key + '%', oldValue);
-		if (!newValue.equals(value) && newValue.startsWith(",")) {
-			// replacement took place, but starts with 'empty' value
-			newValue = newValue.substring(1);
-		}
-		return super.put(key, newValue);
-	}
+    /**
+     * Put string.
+     *
+     * @param key   the key
+     * @param value the value
+     * @return the object
+     */
+    private Object putString(String key, String value) {
+        String systemProperty = System.getProperties().getProperty(key);
+        if (systemProperty != null && !systemProperty.equals(value)) {
+            LogManager.getLogger(getClass()).error("Cannot overwrite system property: " + key + "=" + value);
+            return systemProperty;
+        }
+        String oldValue = (String) super.get(key);
+        String newValue = oldValue == null ? value : value.replaceAll('%' + key + '%', oldValue);
+        if (!newValue.equals(value) && newValue.startsWith(",")) {
+            // replacement took place, but starts with 'empty' value
+            newValue = newValue.substring(1);
+        }
+        return super.put(key, newValue);
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Hashtable#get(java.lang.Object)
-	 */
-	@Override
-	public synchronized Object get(Object key) {
-		String systemProperty = System.getProperties().getProperty((String) key);
-		return systemProperty != null ? systemProperty : super.get(key);
-	}
+    /* (non-Javadoc)
+     * @see java.util.Hashtable#get(java.lang.Object)
+     */
+    @Override
+    public synchronized Object get(Object key) {
+        String systemProperty = System.getProperties().getProperty((String) key);
+        return systemProperty != null ? systemProperty : super.get(key);
+    }
 
-	/**
-	 * Gets the as map.
-	 *
-	 * @return the as map
-	 */
-	Map<String, String> getAsMap() {
-		@SuppressWarnings("rawtypes")
-		Map compileFix = this;
-		@SuppressWarnings("unchecked")
-		Map<String, String> returns = compileFix;
-		return returns;
-	}
+    /**
+     * Gets the as map.
+     *
+     * @return the as map
+     */
+    Map<String, String> getAsMap() {
+        @SuppressWarnings("rawtypes")
+        Map compileFix = this;
+        @SuppressWarnings("unchecked")
+        Map<String, String> returns = compileFix;
+        return returns;
+    }
 
-	/**
-	 * Creates a new <code>MCRProperties</code> instance with the values of the
-	 * given properties.
-	 *
-	 * @param properties
-	 *            the properties
-	 * @return the app properties
-	 */
-	public static AppProperties copy(Properties properties) {
-		AppProperties p = new AppProperties();
-		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-			p.put(entry.getKey(), entry.getValue());
-		}
-		return p;
-	}
+    /**
+     * Creates a new <code>AppProperties</code> instance with the values of the
+     * given properties.
+     *
+     * @param properties the properties
+     * @return the app properties
+     */
+    public static AppProperties copy(Properties properties) {
+        AppProperties p = new AppProperties();
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+            p.put(entry.getKey(), entry.getValue());
+        }
+        return p;
+    }
 
 }
