@@ -1,10 +1,11 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpResponse, HttpEventType } from "@angular/common/http";
+import { HttpClient, HttpEventType, HttpResponse } from "@angular/common/http";
 
 import { environment } from "../../environments/environment";
 
 import { Observable, Subject } from "rxjs";
-import { distinctUntilChanged, map, last } from "rxjs/operators";
+import { distinctUntilChanged, last, map } from "rxjs/operators";
+import { Config } from "../definitions";
 
 export enum DetailLevel {
     SUMMARY = "summary",
@@ -38,7 +39,8 @@ export class ApiService {
         return null;
     }
 
-    constructor(public $http: HttpClient) { }
+    constructor(public $http: HttpClient) {
+    }
 
     acceptDetailsHeader(level: DetailLevel = DetailLevel.NORMAL, mimeType: string = "application/json") {
         const options = Object.assign({}, this.httpOptions);
@@ -72,7 +74,7 @@ export class ApiService {
 
     createObjectUrl(url: string, progress?: Subject<number>): Observable<ObjectUrl> {
         return this.$http.get(url, {
-            headers: { accept: "*/*" },
+            headers: {accept: "*/*"},
             observe: "events",
             responseType: "blob",
             reportProgress: progress !== undefined
@@ -97,6 +99,13 @@ export class ApiService {
             }),
             last()
         );
+    }
+
+    /**
+     * Config
+     */
+    getConfiguration(startsWith?: string) {
+        return this.$http.get<Config>(`${this.base}/config/${startsWith || ""}`);
     }
 
     /**
